@@ -82,7 +82,14 @@ If it returns IP then exit minicom and run:
 
 Check if you can ping core ( ping 192.168.3.100 )
 
-3) Για να δημιουργήσεις traffic με τα apps στο core: 
+3) Change the default routes for each UE:
+
+   sudo route delete default gw 10.0.1.200 eth0
+   sudo route add default gw 192.168.20.1 wwan0
+
+
+
+4) Για να δημιουργήσεις traffic με τα apps στο core: 
 
 -- For WebRTC: sudo chromium-browser 192.168.3.101:8000 --no-sandbox &  (background run)
    kill: pkill chromium
