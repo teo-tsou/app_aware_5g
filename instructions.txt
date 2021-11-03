@@ -79,8 +79,11 @@ at^dhcp?
 
 If it returns IP then exit minicom and run:
 ./attach-ip.sh
+(wwan0 IP attached and default routed on wwan0)
 
 Check if you can ping core ( ping 192.168.3.100 )
+
+
 
 3) Για να δημιουργήσεις traffic με τα apps στο core: 
 
