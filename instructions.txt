@@ -85,7 +85,7 @@ Check if you can ping core ( ping 192.168.3.100 )
 
 
 
-4) Για να δημιουργήσεις traffic με τα apps στο core: 
+3) Για να δημιουργήσεις traffic με τα apps στο core: 
 
 -- For WebRTC: sudo chromium-browser 192.168.3.101:8000 --no-sandbox &  (background run)
    kill: pkill chromium
