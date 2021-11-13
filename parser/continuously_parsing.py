@@ -14,7 +14,7 @@ import time
 def packet_parser(window_duration=100, prediction_interval=1, first_pred_offset=1):
     """
     This funtion sniffs and stored continously the filtered packets. 
-    When the time come it starts predicting on every standard time interval.
+    When the time come it starts predicting on a standard time interval.
     It finds the X window by searching back in time from the current time until the window_duration passes in the new_df. 
 
     Params:
