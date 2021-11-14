@@ -3,29 +3,43 @@ import ipaddress
 import pandas as pd
 import numpy as np
 from numpy import array
-from keras.models import Sequential
-from keras.layers import LSTM
-from keras.layers import Dense
+# from keras.models import Sequential
+# from keras.layers import LSTM
+# from keras.layers import Dense
 from sklearn.preprocessing import MinMaxScaler
 import matplotlib.pyplot as plt
 import time
 
 
-def packet_parser(mini_window_duration=1, max_mws, first_pred_offset=1):
+def packet_parser(mini_window_duration=1, max_mws=2, mode=0, verbose=0):
     """
-    This funtion sniffs and stored continously the filtered packets. 
-    When the time come it starts predicting on a standard time interval.
-    It finds the X window by searching back in time from the current time until the window_duration passes in the new_df. 
+    This function is used to sniff continuously an interface. By using a timer, it creates mini-windows on a specific time interval
+    (mini_window_duration).
+
+    It keeps the mini-windows to a structure. When their number reaches a maximum threshold, it drops the oldest mini-window in order 
+    to append the newest one.
+
+    When the number of mini-windows stored becomes equal to the maximum number of mini-windows (max_mws), it process them as a 
+    X_window and begins predictions.
+
+    This script runs on two modes.
+            a) Data Collection (mode=0):
+                    This mode creates an output file to save all mini-windows found. Later we use this file for training. 
+
+            b) Experiment (mode=1):
+                    This mode creates predictions and policy slices by sensing and analyzing the channel.
 
     Params:
-    - window_duration:  Time duration of a X window, that will be used for preditions.
+    - mini_window_duration:  Time interval of a mini-window.
 
-    - prediction_interval: Time duration of how often we will make predictions.
+    - max_mws: Number of mini-windows needed to make predictions.
 
-    - first_pred_offset: Time duration to wait until the first prediction. We wait to collect enough data for X window.
+    - mode: Data Collection (mode=0), Experiment (mode=1)
+
+    - verbose: if set to 1, it prints algorithms logs to console.
     """
 
-    # mini windows dict
+    # init mini windows dict structure
     mw_dict = { }
     mw_dict['UE1'] = {}
     mw_dict['UE1']['web-rtc'] = []
@@ -40,16 +54,35 @@ def packet_parser(mini_window_duration=1, max_mws, first_pred_offset=1):
     mw_dict['UE3']['sipp'] = []
     mw_dict['UE3']['web-server'] = []
 
-
+    # init counter of mini-windows
     mw_num = 0
+    
 
-    capture = pyshark.LiveCapture(interface='net3',only_summaries= True)
+    # init the capture
+    ## uncomment below line and comment the FIleCapture, when you finish script development and want to use it on an interface.
+    #capture = pyshark.LiveCapture(interface='net3',only_summaries= True)
+    capture = pyshark.FileCapture('traffic.pcap',only_summaries= True)
+
+    # init dataframe for mini-window
     mini_window_df = pd.DataFrame(columns = ['Time', 'UE-App', 'Length'])
-    mw_time_start = -1
-    for packet in capture.sniff_continuously():
+
+    ## uncomment below line when you finish script development and want to use it on an interface.
+    #for packet in capture.sniff_continuously():
+
+    # siple counter to count packets if needed
+    counter=0
+    
+    # start mini-window timer
+    start_timer = time.time()
+
+    # for every new packet
+    for packet in capture:
+        counter+=1
+
+        # filter packet (Idea: you can apply filters inside LiveCapture maybe)
         if (packet.protocol == 'UDP' or packet.protocol == 'SIP' or packet.protocol == 'HTTP' or packet.protocol == 'TCP' or packet.protocol == 'STUN' or packet.protocol == 'DTLSv1.2') and (ipaddress.ip_address(packet.destination) in ipaddress.ip_network('192.168.20.0/24') or ipaddress.ip_address(packet.source) in ipaddress.ip_network('192.168.20.0/24')) and (ipaddress.ip_address(packet.destination) in ipaddress.ip_network('192.168.3.0/24') or ipaddress.ip_address(packet.source) in ipaddress.ip_network('192.168.3.0/24')):
             
-            # append to mini-window df every filtered packet
+            # obtain stats in the appropriate form
             if packet.source == '192.168.3.101' or packet.destination == '192.168.3.101' :
                 app = 'web-rtc'
             if packet.source == '192.168.3.102' or packet.destination == '192.168.3.102' :
@@ -62,56 +95,67 @@ def packet_parser(mini_window_duration=1, max_mws, first_pred_offset=1):
                 ue = 'UE2'
             if packet.source == '192.168.20.4' or packet.destination == '192.168.20.4' :
                 ue = 'UE3'    
-            time = packet.time            
+            p_time = packet.time            
             ue_app = str(ue) + ": " + str(app)        
-            length = packet.length
-            data = {'Time': time, 'UE-App':ue_app, 'Length':length}
+            length = eval(packet.length)
+            data = {'Time': [p_time], 'UE-App':[ue_app], 'Length':[length]}
+
+            # append packet data to mini-window df
             temp_df = pd.DataFrame.from_dict(data)
             mini_window_df = mini_window_df.append(temp_df, ignore_index=True)
-
-            # for first time set time of first packet
-            if mw_time_start == -1:
-                mw_time_start = time
         
-            # check time
-            mw_time_end = packet.time
+        # check time
+        end_timer = time.time()
 
-            # check if mini window duration passed and we are ready to analyze mini window
-            if mw_time_end - mw_time_start >= mini_window_duration and mw_time_start != -1:
-                
-                # re-init mini_window timer for next mini window
-                mw_time_start = -1
+        # check if mini window duration passed and we are ready to analyze mini window
+        if end_timer - start_timer >= mini_window_duration:
+            
+            if verbose:
+                print("Crop Mini Window:",end_timer - start_timer)
 
-                # ready to create mini-window data
-                # if num of mini windows is already max_mws, we must drop the first mini-window
-                if mw_num == max_mws:
-                    # drop first mini-window
-                    mw_dict = drop_first(mw_dict)
-                    
-                    # count mini windows
-                    mw_num = len(mw_dict['UE1']['web-rtc'])
+            # re-init mini_window timer for next mini window
+            start_timer = time.time()
 
-                # now create and append current mini-window
-                mw_dict = make_mini_window(mw_dict, window)
-                mw_num = mw_num = len(mw_dict['UE1']['web-rtc'])
-                
-                # re-init mini-window df for next mini window
-                mini_window_df = pd.DataFrame(columns = ['Time', 'UE-App', 'Length'])
-
-
-
-            # check if it is time to obtain X window
+            # ready to create mini-window data
+            # if num of mini windows is already max_mws, we must drop the first mini-window
             if mw_num == max_mws:
+                # drop first mini-window
+                mw_dict = drop_first(mw_dict)
+                
+                # count mini windows
+                mw_num = len(mw_dict['UE1']['web-rtc'])
+
+            # now create and append current mini-window
+            mw_dict = make_mini_window(mw_dict, mini_window_df)
+
+            ## Data Collecting Mode: 
+            # Store Mini-Window to file
+            if mode == 0:
+                # store in csv format
+                pass
+
+            # count mini windows
+            mw_num = len(mw_dict['UE1']['web-rtc'])
+            
+            # re-init mini-window df for next mini window
+            mini_window_df = pd.DataFrame(columns = ['Time', 'UE-App', 'Length'])
+
+
+            ## Experiment Mode: 
+            # check if it is time to obtain X window
+            if mw_num == max_mws and mode == 1:
+                if verbose:
+                    print("Obtain X window with {} mini-windows".format(mw_num))
+                    print()
+
                 
                 # obtain X window, from all mini_windows
-                X = mw_dict
-
                 # to array
-                X_list = array_x(X)
-
+                X_list = array_x(mw_dict)
+                
                 # scale 
                 X_scaled = scale_x(X_list)
-
+                
                 # predict
                 yhat = predict(X_scaled)
 
@@ -120,20 +164,16 @@ def packet_parser(mini_window_duration=1, max_mws, first_pred_offset=1):
 
             elif mw_num > max_mws:
                 print("[ERROR]: Mini-windows surpassed max limit!")
-                exit()
-                
-
-    return mini_window_df                
+                exit()    
+    return           
 
 
 def make_mini_window(mw_dict, window):
 
     '''Finds the beggining indexes for each window'''
-    
     # crop window    
     length_sum = dict(window.groupby('UE-App')['Length'].sum())
     window_combs = list(window['UE-App'].unique())
-
 
     for key, value in mw_dict.items():
         for j in list(mw_dict[key].keys()):
@@ -150,32 +190,27 @@ def drop_first(mw_dict):
         for app in list(mw_dict[ue].keys()):
             # for every app 
 
-            temp_list = mw_dict[ue][app])
+            temp_list = mw_dict[ue][app]
             del temp_list[0]
 
             mw_dict[ue][app] = temp_list
 
     return mw_dict
 
-def extract_x(X, mw_dict):
-    for (k,v), (k2,v2) in zip(X.items(), mw_dict.items()):
-        # for every ue
-        if k == k2:
-            # for every app
-            for value in list(mw_dict[k].keys()):
-                X[k][value].append(mw_dict[k][value])
-    return X
-
-
 def array_x(X):
     iters = len(X['UE1']['web-rtc'])
     X_list = []
-    for i in range(iters):
-        temp_list = []
-        for ue, stats in X.items():
-            for app, values in stats.items():
-                temp_list.append(values[i])
-        X_list.append(temp_list)
+    temp_list = []
+
+    for ue, stats in X.items():
+        # for every ue
+        for app, values in stats.items():
+            # for ever app 
+
+            # 
+            temp_list.append(values)
+    X_list.append(temp_list)
+
     
     return X_list    
 
@@ -185,13 +220,15 @@ def scale_x(X_list):
     scaler = MinMaxScaler()
     flattened = np.array(X_list).reshape(-1,1)
     rescaled = scaler.fit_transform(flattened)
-    X_scaled = rescaled.reshape(16,9,4)
+
+    X_scaled = rescaled.reshape(1,9,2)
+
     return X_scaled
 
 def predict(X_scaled):
     # To Do: Make sure we predict 1 value at a time. Reconfigure all functions needed
-    yhat = model.predict(X_scaled[0].reshape(1,9,4))
-
+    #yhat = model.predict(X_scaled)
+    yhat = -1
 
     return yhat
 
@@ -199,3 +236,8 @@ def predict(X_scaled):
 def post_slice(yhat):
     # make a policy based on yhat
     pass
+
+
+
+if __name__ == "__main__":
+    packet_parser(mini_window_duration=1, max_mws=2, mode=0, verbose=1)
