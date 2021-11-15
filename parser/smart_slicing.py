@@ -161,7 +161,7 @@ def packet_parser(mini_window_duration=1, max_mws=2, mode=0, verbose=0, file_nam
                 X_list = array_x(mw_dict)
                 
                 # scale 
-                X_scaled = scale_x(X_list)
+                X_scaled = scale_x(X_list,max_mws)
                 
                 # predict
                 yhat = predict(X_scaled)
@@ -222,13 +222,13 @@ def array_x(X):
     return X_list    
 
 
-def scale_x(X_list):
+def scale_x(X_list,max_mws):
     # To Do:  here we will load the scaler used in model training 
     scaler = MinMaxScaler()
     flattened = np.array(X_list).reshape(-1,1)
     rescaled = scaler.fit_transform(flattened)
 
-    X_scaled = rescaled.reshape(1,9,2)
+    X_scaled = rescaled.reshape(1,9,max_mws)
 
     return X_scaled
 
