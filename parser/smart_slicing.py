@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import time
 
 
-def packet_parser(mini_window_duration=1, max_mws=2, mode=0, verbose=0):
+def packet_parser(mini_window_duration=1, max_mws=2, mode=0, verbose=0, file_name="mini-windows.csv"):
     """
     This function is used to sniff continuously an interface. By using a timer, it creates mini-windows on a specific time interval
     (mini_window_duration).
@@ -37,6 +37,8 @@ def packet_parser(mini_window_duration=1, max_mws=2, mode=0, verbose=0):
     - mode: Data Collection (mode=0), Experiment (mode=1)
 
     - verbose: if set to 1, it prints algorithms logs to console.
+
+    - file_name: Name of output file to store mini-windows.
     """
 
     # init mini windows dict structure
@@ -66,15 +68,20 @@ def packet_parser(mini_window_duration=1, max_mws=2, mode=0, verbose=0):
     # init dataframe for mini-window
     mini_window_df = pd.DataFrame(columns = ['Time', 'UE-App', 'Length'])
 
-    ## uncomment below line when you finish script development and want to use it on an interface.
-    #for packet in capture.sniff_continuously():
-
     # siple counter to count packets if needed
     counter=0
     
     # start mini-window timer
     start_timer = time.time()
 
+    # Data Collection mode: Init output file
+    if mode == 0:
+        f = open(file_name,'w')
+        f.write("UE1: web-rtc,UE1: sipp,UE1: web-server,UE2: web-rtc,UE2: sipp,UE2: web-server,UE3: web-rtc,UE3: sipp,UE3: web-server\n")
+        f.close()
+
+    ## use below line when you finish script development and want to use it on an interface.
+    #for packet in capture.sniff_continuously():
     # for every new packet
     for packet in capture:
         counter+=1
@@ -132,7 +139,7 @@ def packet_parser(mini_window_duration=1, max_mws=2, mode=0, verbose=0):
             # Store Mini-Window to file
             if mode == 0:
                 # store in csv format
-                pass
+                store_mini_window(file_name,mw_dict)
 
             # count mini windows
             mw_num = len(mw_dict['UE1']['web-rtc'])
@@ -236,6 +243,25 @@ def predict(X_scaled):
 def post_slice(yhat):
     # make a policy based on yhat
     pass
+
+def store_mini_window(file_name, mw_dict):
+    f = open(file_name,'a')
+
+    for ue, stats in mw_dict.items():
+        # for every ue
+        for app, value in stats.items():
+            # for ever app
+            
+            value = str(value[0])
+            if ue=='UE3' and app == 'web-server':
+                # last packet
+                f.write(value)
+                f.write("\n")
+            else:
+                f.write(value)
+                f.write(",")
+        
+    f.close()
 
 
 
