@@ -9,6 +9,7 @@ from numpy import array
 from sklearn.preprocessing import MinMaxScaler
 import matplotlib.pyplot as plt
 import time
+import math
 
 
 def packet_parser(mini_window_duration=1, max_mws=2, mode=0, verbose=0, file_name="notimer_mini-windows.csv"):
@@ -39,11 +40,12 @@ def packet_parser(mini_window_duration=1, max_mws=2, mode=0, verbose=0, file_nam
     mw_dict['UE3']['web-rtc'] = []
     mw_dict['UE3']['sipp'] = []
     mw_dict['UE3']['web-server'] = []
+    mw_dict['Time'] = []
 
     # Data Collection mode: Init output file
     if mode == 0:
         f = open(file_name,'w')
-        f.write("UE1: web-rtc,UE1: sipp,UE1: web-server,UE2: web-rtc,UE2: sipp,UE2: web-server,UE3: web-rtc,UE3: sipp,UE3: web-server\n")
+        f.write("UE1: web-rtc,UE1: sipp,UE1: web-server,UE2: web-rtc,UE2: sipp,UE2: web-server,UE3: web-rtc,UE3: sipp,UE3: web-server,Time\n")
         f.close()
 
     mw_num = 0
@@ -58,11 +60,17 @@ def packet_parser(mini_window_duration=1, max_mws=2, mode=0, verbose=0, file_nam
     lengths = []
 
     #for packet in capture.sniff_continuously():
-    counter=0
+    counter=1
 
     start_timer = time.time()
     for packet in capture:
-        counter+=1
+        # counter+=1
+
+        # # check that you dont miss packets
+        # if packet.no != '2' and packet.no != str(counter):
+        #     print('problem: Counter=',counter,'packet no=',packet.no)
+        #     exit()
+
         if (packet.protocol == 'UDP' or packet.protocol == 'SIP' or packet.protocol == 'HTTP' or packet.protocol == 'TCP' or packet.protocol == 'STUN' or packet.protocol == 'DTLSv1.2') and (ipaddress.ip_address(packet.destination) in ipaddress.ip_network('192.168.20.0/24') or ipaddress.ip_address(packet.source) in ipaddress.ip_network('192.168.20.0/24')) and (ipaddress.ip_address(packet.destination) in ipaddress.ip_network('192.168.3.0/24') or ipaddress.ip_address(packet.source) in ipaddress.ip_network('192.168.3.0/24')):
             
             # append to mini-window df every filtered packet
@@ -78,6 +86,7 @@ def packet_parser(mini_window_duration=1, max_mws=2, mode=0, verbose=0, file_nam
                 ue = 'UE2'
             if packet.source == '192.168.20.4' or packet.destination == '192.168.20.4' :
                 ue = 'UE3'    
+
 
             times.append(packet.time)
             ue_apps.append(str(ue) + ": " + str(app))
@@ -95,62 +104,39 @@ def packet_parser(mini_window_duration=1, max_mws=2, mode=0, verbose=0, file_nam
 
                 # if there are more than 1 mini-windows inside this time frame
                 if mw_time_end - mw_time_start > 1.5:
-                    elapsed_time = mw_time_end - mw_time_start
+                    # we must break this to the appropriate mini-windows num
+                    # we will find the num of mini-windows that exist inside the time frame elapsed time of the two packets
+                    # then we will assign the first packet to the first mini-window and the second packet to the last mini-window
+                    # we will fill the mini-windows in between with zeroes
+
+                    # elapsed time
+                    elapsed_time = mw_time_end - mw_time_start 
+
+                    # num of mini-windows that we need to create
                     num_mw_inside = round(elapsed_time/mini_window_duration)
 
-                    # we must break this to the appropriate mini-windows num
+                    # new duration of new mini-windows
+                    new_duration = (float)(elapsed_time/num_mw_inside)
 
-
-
-                    mw_num = len(mw_dict['UE1']['web-rtc'])
-
-
-
-                    ######################### first packet to first mini-window
-                    if mw_num == max_mws:
-                        # drop first mini-window
-                        mw_dict = drop_first(mw_dict)
-                        
-                        # count mini windows
-                        mw_num = len(mw_dict['UE1']['web-rtc'])
+                    #print("MANY MINI-WINDOWS: ",elapsed_time,'mw_time_start',mw_time_start,'num_mw_inside',num_mw_inside,'TIMES',times)
                     
-                    mw_dict = make_mini_window(mw_dict, times[0], ue_apps[0], lengths[0],one=1)
-                    mw_num = len(mw_dict['UE1']['web-rtc'])
+                    #################### for mini-windows in between
+                    for i in range(num_mw_inside):
 
+                        # find indexes
+                        new_times = []
+                        new_lengths = []
+                        new_ue_apps = []
+                        for c_time, c_ue_app, c_length in zip(times, ue_apps, lengths):
 
-                    ## Data Collecting Mode: 
-                    # Store Mini-Window to file
-                    if mode == 0:
-                        # store in csv format
-                        store_mini_window(file_name,mw_dict)
+                            # obtain times that are for every new mini-window
+                            if eval(c_time) >= mw_time_start + i*new_duration and eval(c_time) <= mw_time_start + (i+1)*new_duration:
+                                new_times.append(c_time+'-')
+                                new_lengths.append(c_length)
+                                new_ue_apps.append(c_ue_app)
 
-
-
-                    # check if it is time to obtain X window
-                    if mw_num == max_mws and mode == 1:
-                        print("Obtain X window with {} mini-windows".format(mw_num))
+                        #print("Found : ",new_times,new_lengths)
                         
-                        # obtain X window, from all mini_windows
-                        # to array
-                        X_list = array_x(mw_dict)
-                        
-                        # scale 
-                        X_scaled = scale_x(X_list)
-                        
-                        # predict
-                        yhat = predict(X_scaled)
-
-                        # post slice
-                        post_slice(yhat)
-
-                    elif mw_num > max_mws:
-                        print("[ERROR]: Mini-windows surpassed max limit!")
-                        exit()    
-
-
-                    #################### for mini-windows in between, set them to zero
-                    for i in range(1,num_mw_inside-1):
-
                         mw_num = len(mw_dict['UE1']['web-rtc'])
                         if mw_num == max_mws:
                             # drop first mini-window
@@ -159,8 +145,9 @@ def packet_parser(mini_window_duration=1, max_mws=2, mode=0, verbose=0, file_nam
                             # count mini windows
                             mw_num = len(mw_dict['UE1']['web-rtc'])
                         
-                        mw_dict = make_mini_window(mw_dict, [], [], [])
-
+                        mw_dict = make_mini_window(mw_dict, new_times, new_ue_apps,new_lengths)
+                        # count mini windows
+                        mw_num = len(mw_dict['UE1']['web-rtc'])
 
                         ## Data Collecting Mode: 
                         # Store Mini-Window to file
@@ -170,7 +157,8 @@ def packet_parser(mini_window_duration=1, max_mws=2, mode=0, verbose=0, file_nam
 
                         # check if it is time to obtain X window
                         if mw_num == max_mws and mode == 1:
-                            print("Obtain X window with {} mini-windows".format(mw_num))
+                            if verbose:
+                                print("Obtain X window with {} mini-windows".format(mw_num))
                             
                             # obtain X window, from all mini_windows
                             # to array
@@ -189,30 +177,9 @@ def packet_parser(mini_window_duration=1, max_mws=2, mode=0, verbose=0, file_nam
                             print("[ERROR]: Mini-windows surpassed max limit!")
                             exit()    
 
-
-
-                    mw_num = len(mw_dict['UE1']['web-rtc'])
-
-                    ############################# second packet to last mini-window
-                    if mw_num == max_mws:
-                        # drop first mini-window
-                        mw_dict = drop_first(mw_dict)
-                        
-                        # count mini windows
-                        mw_num = len(mw_dict['UE1']['web-rtc'])
                     
-                    mw_dict = make_mini_window(mw_dict, times[1], ue_apps[1], lengths[1],one=1)
-
-
                     # re-init mini_window timer for next mini window
                     mw_time_start = -1
-
-                    ## Data Collecting Mode: 
-                    # Store Mini-Window to file
-                    if mode == 0:
-                        # store in csv format
-                        store_mini_window(file_name,mw_dict)
-                    
                     
                     # re-init mini-window df for next mini window
                     times = []
@@ -221,7 +188,8 @@ def packet_parser(mini_window_duration=1, max_mws=2, mode=0, verbose=0, file_nam
 
                     # check if it is time to obtain X window
                     if mw_num == max_mws and mode == 1:
-                        print("Obtain X window with {} mini-windows".format(mw_num))
+                        if verbose:
+                            print("Obtain X window with {} mini-windows".format(mw_num))
                         
                         # obtain X window, from all mini_windows
                         # to array
@@ -244,8 +212,8 @@ def packet_parser(mini_window_duration=1, max_mws=2, mode=0, verbose=0, file_nam
                     continue
 
 
-
-                print("Crop Mini Window:",mw_time_end - mw_time_start)
+                if verbose:
+                    print("Crop Mini Window:",mw_time_end - mw_time_start)
                 # re-init mini_window timer for next mini window
                 mw_time_start = -1
 
@@ -280,7 +248,8 @@ def packet_parser(mini_window_duration=1, max_mws=2, mode=0, verbose=0, file_nam
 
                 # check if it is time to obtain X window
                 if mw_num == max_mws and mode == 1:
-                    print("Obtain X window with {} mini-windows".format(mw_num))
+                    if verbose:
+                        print("Obtain X window with {} mini-windows".format(mw_num))
                     
                     # obtain X window, from all mini_windows
                     # to array
@@ -306,17 +275,32 @@ def make_mini_window(mw_dict, times, ue_apps, lengths,one=0):
     
     if one==1:
         data = {'Time': [times], 'UE-App':[ue_apps], 'Length':[lengths]}
+        if times == []:
+            time0 = '-'
+        else:
+            time0 = times
     else:
         data = {'Time': times, 'UE-App':ue_apps, 'Length':lengths}
+        if times == []:
+            time0 = '-'
+        else:
+            time0 = times[0]
     window = pd.DataFrame.from_dict(data)
-    
+    #print(data)
     # crop window    
     length_sum = dict(window.groupby('UE-App')['Length'].sum())
     window_combs = list(window['UE-App'].unique())
-
+    #print(length_sum)
     for key, value in mw_dict.items():
+        if key == 'Time':
+            if time0 == []:
+                mw_dict[key].append('-')
+            else:
+                mw_dict[key].append(time0)
+            continue
         for j in list(mw_dict[key].keys()):
             comb = str(key) + ": " + str(j)
+            
             if comb in window_combs:
                 mw_dict[key][str(j)].append(length_sum[comb])
             else:
@@ -326,6 +310,8 @@ def make_mini_window(mw_dict, times, ue_apps, lengths,one=0):
 def drop_first(mw_dict):
     for ue,stats in mw_dict.items():
         # for every ue
+        if ue == 'Time':
+            continue
         for app in list(mw_dict[ue].keys()):
             # for every app 
 
@@ -383,6 +369,11 @@ def store_mini_window(file_name, mw_dict):
 
     for ue, stats in mw_dict.items():
         # for every ue
+        if ue == 'Time':
+            f.write(mw_dict['Time'][-1])
+            f.write("\n")
+            continue
+
         for app, value in stats.items():
             # for ever app
             
@@ -390,7 +381,7 @@ def store_mini_window(file_name, mw_dict):
             if ue=='UE3' and app == 'web-server':
                 # last packet
                 f.write(value)
-                f.write("\n")
+                f.write(",")
             else:
                 f.write(value)
                 f.write(",")
