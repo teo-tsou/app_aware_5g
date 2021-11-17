@@ -63,7 +63,7 @@ def packet_parser(mini_window_duration=1, max_mws=2, mode=0, verbose=0, file_nam
     # init the capture
     ## uncomment below line and comment the FIleCapture, when you finish script development and want to use it on an interface.
     #capture = pyshark.LiveCapture(interface='net3',only_summaries= True)
-    capture = pyshark.FileCapture('traffic.pcap',only_summaries= True)
+    capture = pyshark.FileCapture('scenario2-traffic.pcap',only_summaries= True)
 
     # init dataframe for mini-window
     mini_window_df = pd.DataFrame(columns = ['Time', 'UE-App', 'Length'])
@@ -71,8 +71,6 @@ def packet_parser(mini_window_duration=1, max_mws=2, mode=0, verbose=0, file_nam
     # siple counter to count packets if needed
     counter=0
     
-    # start mini-window timer
-    start_timer = time.time()
 
     # Data Collection mode: Init output file
     if mode == 0:
@@ -83,6 +81,14 @@ def packet_parser(mini_window_duration=1, max_mws=2, mode=0, verbose=0, file_nam
     ## use below line when you finish script development and want to use it on an interface.
     #for packet in capture.sniff_continuously():
     # for every new packet
+
+    # start mini-window timer
+    start_timer = time.time()
+
+    times = []
+    ue_apps = []
+    lengths = []
+
     for packet in capture:
         counter+=1
 
@@ -102,21 +108,21 @@ def packet_parser(mini_window_duration=1, max_mws=2, mode=0, verbose=0, file_nam
                 ue = 'UE2'
             if packet.source == '192.168.20.4' or packet.destination == '192.168.20.4' :
                 ue = 'UE3'    
-            p_time = packet.time            
-            ue_app = str(ue) + ": " + str(app)        
-            length = eval(packet.length)
-            data = {'Time': [p_time], 'UE-App':[ue_app], 'Length':[length]}
-
-            # append packet data to mini-window df
-            temp_df = pd.DataFrame.from_dict(data)
-            mini_window_df = mini_window_df.append(temp_df, ignore_index=True)
         
+
+            times.append(packet.time)
+            ue_apps.append(str(ue) + ": " + str(app))
+            lengths.append(eval(packet.length))
+
+
         # check time
         end_timer = time.time()
 
         # check if mini window duration passed and we are ready to analyze mini window
         if end_timer - start_timer >= mini_window_duration:
-            
+            if end_timer - start_timer >= 1.5:
+                print('Lost Mini-windows')
+                exit()
             if verbose:
                 print("Crop Mini Window:",end_timer - start_timer)
 
@@ -133,7 +139,7 @@ def packet_parser(mini_window_duration=1, max_mws=2, mode=0, verbose=0, file_nam
                 mw_num = len(mw_dict['UE1']['web-rtc'])
 
             # now create and append current mini-window
-            mw_dict = make_mini_window(mw_dict, mini_window_df)
+            mw_dict = make_mini_window(mw_dict, times, ue_apps, lengths)
 
             ## Data Collecting Mode: 
             # Store Mini-Window to file
@@ -145,8 +151,10 @@ def packet_parser(mini_window_duration=1, max_mws=2, mode=0, verbose=0, file_nam
             mw_num = len(mw_dict['UE1']['web-rtc'])
             
             # re-init mini-window df for next mini window
-            mini_window_df = pd.DataFrame(columns = ['Time', 'UE-App', 'Length'])
-
+            times = []
+            ue_apps = []
+            lengths = []
+            
 
             ## Experiment Mode: 
             # check if it is time to obtain X window
@@ -175,8 +183,10 @@ def packet_parser(mini_window_duration=1, max_mws=2, mode=0, verbose=0, file_nam
     return           
 
 
-def make_mini_window(mw_dict, window):
-
+def make_mini_window(mw_dict, times, ue_apps, lengths):
+    data = {'Time': times, 'UE-App':ue_apps, 'Length':lengths}
+    window = pd.DataFrame.from_dict(data)
+    
     '''Finds the beggining indexes for each window'''
     # crop window    
     length_sum = dict(window.groupby('UE-App')['Length'].sum())
@@ -189,6 +199,7 @@ def make_mini_window(mw_dict, window):
                 mw_dict[key][str(j)].append(length_sum[comb])
             else:
                 mw_dict[key][str(j)].append(0) 
+
     return mw_dict
 
 def drop_first(mw_dict):
@@ -246,18 +257,20 @@ def post_slice(yhat):
 
 def store_mini_window(file_name, mw_dict):
     f = open(file_name,'a')
-
+    print(mw_dict)
     for ue, stats in mw_dict.items():
         # for every ue
         for app, value in stats.items():
             # for ever app
             
-            value = str(value[0])
+            value = str(value[-1])
             if ue=='UE3' and app == 'web-server':
                 # last packet
                 f.write(value)
+                print(value)
                 f.write("\n")
             else:
+                print(value)
                 f.write(value)
                 f.write(",")
         
