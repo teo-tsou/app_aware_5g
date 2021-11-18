@@ -5,12 +5,12 @@ URL = "http://192.168.18.202:9999/stats/"
 rnti = []
 all_ues = 0
 while(1):
-    r = requests.get(url = URL)
-
-    data = r.json()
 
     if all_ues == 1:
         break
+
+    r = requests.get(url = URL)
+    data = r.json()
     
     if data['eNB_config']:
         for enb in data['eNB_config']:
