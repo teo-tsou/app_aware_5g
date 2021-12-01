@@ -7,7 +7,7 @@ from numpy import array
 # from keras.layers import LSTM
 # from keras.layers import Dense
 from sklearn.preprocessing import MinMaxScaler
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import time
 import math
 
