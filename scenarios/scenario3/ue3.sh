@@ -35,7 +35,7 @@ do
 done
 
 #WEB-RTC
-sudo chromium-browser 192.168.3.101:8000 --no-sandbox &
+sudo chromium-browser 192.168.3.101:8000 --no-sandbox --disable-application-cache &
 sleep 52
 pkill chromium
 
