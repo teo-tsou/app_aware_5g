@@ -1,4 +1,4 @@
-sleep 21.44
+sleep 22.17
 
 #WEB-SERVER
 start_time=$(date +%s)
@@ -7,7 +7,7 @@ end_time=$(date +%s)
 
 #elapsed time with second resolution
 elapsed=$(( end_time - start_time ))
-while [ $elapsed -lt 7.51 ]
+while [ $elapsed -lt 7.61 ]
 do
         curl -H 'Cache-Control: no-cache' 192.168.3.103:80
         echo "Elapsed time: $elapsed"
@@ -15,7 +15,7 @@ do
         elapsed=$(( end_time - start_time ))
 done
 
-sleep 17.58
+sleep 16.74
 
 #WEB-SERVER
 start_time=$(date +%s)
@@ -24,7 +24,7 @@ end_time=$(date +%s)
 
 #elapsed time with second resolution
 elapsed=$(( end_time - start_time ))
-while [ $elapsed -lt 3.43 ]
+while [ $elapsed -lt 3.37 ]
 do
         curl -H 'Cache-Control: no-cache' 192.168.3.103:80
         echo "Elapsed time: $elapsed"
@@ -33,8 +33,8 @@ do
 done
 
 #WEB-RTC
-sudo chromium-browser 192.168.3.101:8000 --no-sandbox &
-sleep 52.55
+sudo chromium-browser 192.168.3.101:8000 --no-sandbox --disable-application-cache &
+sleep 52.93
 pkill chromium
 
 
@@ -45,7 +45,7 @@ end_time=$(date +%s)
 
 #elapsed time with second resolution
 elapsed=$(( end_time - start_time ))
-while [ $elapsed -lt 49.93 ]
+while [ $elapsed -lt 49.6 ]
 do
         curl -H 'Cache-Control: no-cache' 192.168.3.103:80
         echo "Elapsed time: $elapsed"

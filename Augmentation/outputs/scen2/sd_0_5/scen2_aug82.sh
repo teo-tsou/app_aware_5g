@@ -1,14 +1,14 @@
 
-sleep 25.35
+sleep 25.25
 
 #SIP
 sudo sipp -sn uac 192.168.3.102:1234 &
-sleep 70.59
+sleep 69.97
 pkill sipp
 
-sleep 4.74
+sleep 5.55
 
 #WEB-RTC
-sudo chromium-browser 192.168.3.101:8000 --no-sandbox &
-sleep 51.8
+sudo chromium-browser 192.168.3.101:8000 --no-sandbox --disable-application-cache &
+sleep 51.53
 pkill chromium
