@@ -1,1 +1,0 @@
-<_io.TextIOWrapper name='../scenarios/scenario3/ue1.sh' mode='r' encoding='UTF-8'>
