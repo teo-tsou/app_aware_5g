@@ -391,7 +391,7 @@ def predict(X_scaled,max_mws,verbose=2):
 
     X_input = X_scaled.reshape(1,max_mws,9)
 
-    model = load_model('../models/app_aware_LSTM_weights.best.hdf5')
+    model = load_model('../models/app_aware_LSTM_weights_with_val_loss.best.hdf5')
 
     
     #print('X shape',X_input.shape)
