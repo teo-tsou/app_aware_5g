@@ -14,6 +14,8 @@ import tensorflow
 import keras
 from keras.models import load_model
 import sys
+import json
+import requests
 
 
 def packet_parser(mini_window_duration=1, max_mws=30, mode=0, verbose=0, file_name="/mnt/exp.csv"):
@@ -396,9 +398,6 @@ def predict(X_scaled,max_mws,verbose=2):
 
 def post_slice(yhat,verbose=2):
     # make a policy based on yhat
-    raise_UE1 = 0
-    raise_UE2 = 0
-    raise_UE3 = 0
 
     ue_app_pairs = ['UE1: web-rtc','UE1: sipp','UE1: web-server','UE2: web-rtc','UE2: sipp',
                 'UE2: web-server','UE3: web-rtc','UE3: sipp','UE3: web-server']
@@ -429,21 +428,36 @@ def post_slice(yhat,verbose=2):
 
     # UE 1
     if 'UE1: web-rtc' in predicted and raise_UE1==0:
+        need_post = 1
         raise_UE1 = 1
+        slice0 = 40
     elif 'UE1: web-rtc' not in predicted and raise_UE1==1:
+        need_post = 1
         raise_UE1 = 0
+        slice0 = 8
 
     # UE2
     if 'UE2: web-rtc' in predicted and raise_UE2==0:
+        need_post = 1
         raise_UE2 = 1
+        slice1 = 40
     elif 'UE2: web-rtc' not in predicted and raise_UE2==1:
+        need_post = 1
         raise_UE2 = 0
-
+        slice1 = 8
     # UE3
     if 'UE3: web-rtc' in predicted and raise_UE3==0:
+        need_post = 1
         raise_UE3 = 1
+        slice2 = 40
     elif 'UE3: web-rtc' not in predicted and raise_UE3==1:
+        need_post = 1
         raise_UE3 = 0
+        slice2 = 8
+
+    if need_post == 1:
+        post_configure(slice0, slice1, slice2)
+        need_post = 0    
 
     if verbose == 2:
         print()
@@ -514,6 +528,62 @@ def store_mini_window(file_name, mw_dict):
         
     f.close()
 
+
+def post_configure(slice0, slice1, slice2):
+    # defining the api-endpoint  
+    API_ENDPOINT = "http://192.168.18.202:9999/slice/enb/-1"
+
+    data = {
+        "ul": [
+            {
+                "id": 0,
+                "percentage":16,
+                "maxmcs": 16
+            },
+            {
+                "id": 1,
+                "percentage":17,
+                "maxmcs": 16
+            },
+            {
+                "id": 2,
+                "percentage":16,
+                "maxmcs": 16
+            }
+        ],
+        "dl": [
+            {
+                "id": 0,
+                "percentage":slice0,
+                "maxmcs": 26
+            },
+            {
+                "id": 1,
+                "percentage":slice1,
+                "maxmcs": 26
+            },
+            {
+                "id": 2,
+                "percentage":slice2,
+                "maxmcs": 26
+            }
+        ],
+        "intrasliceShareActive": true,
+        "intersliceShareActive": true
+    }
+
+
+    # sending post request and saving response as response object 
+    r = requests.post(url = API_ENDPOINT, json = data) 
+
+    # extracting response text  
+    #pastebin_url = r.text 
+    #print("The pastebin URL is:%s"%pastebin_url)
+
+    #return data
+
+
 if __name__ == "__main__":
+
     packet_parser(mini_window_duration=1, max_mws=30, mode=1,verbose=0)
 
