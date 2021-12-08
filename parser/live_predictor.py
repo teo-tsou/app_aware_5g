@@ -679,7 +679,7 @@ def post_assoc(rnti):
             ]
         }
         r = requests.post(url = API_ENDPOINT, json = assoc1)
-        time.sleep(0.5)
+        time.sleep(2)
         assoc2 = {
             "ueConfig": [
                 {
@@ -689,7 +689,7 @@ def post_assoc(rnti):
             ]
         }
         r = requests.post(url = API_ENDPOINT, json = assoc2)
-        time.sleep(0.5)
+        time.sleep(2)
         assoc3 = {
             "ueConfig": [
                 {
@@ -706,7 +706,7 @@ def post_assoc(rnti):
     #         "ueConfig": [
     #             {
     #                 "rnti": rnti[0],
-    #                 "dlSliceId": rnti_slice_dict[rnti[0]]
+    #                 "dlSliceId": 0
     #             }
     #         ]
     #     }
@@ -715,12 +715,12 @@ def post_assoc(rnti):
     #         "ueConfig": [
     #             {
     #                 "rnti": rnti[1],
-    #                 "dlSliceId": rnti_slice_dict[rnti[1]]
+    #                 "dlSliceId": 1
     #             }
     #         ]
     #     }
 
-        #r = requests.post(url = API_ENDPOINT, json = assoc2) 
+    #     r = requests.post(url = API_ENDPOINT, json = assoc2) 
 
         
 
@@ -728,10 +728,10 @@ def post_assoc(rnti):
 
 def init_slice(ues=3,slice0=8,slice1=8,slice2=8):
     rnti = rnti_parser(ues)
-    time.sleep(1)
+    time.sleep(3.5)
     post_configure(slice0,slice1,slice2)
-    time.sleep(2)
-    post_assoc(rnti,rnti_slice_dict)
+    time.sleep(0.5)
+    post_assoc(rnti)
 
 
 if __name__ == "__main__":
