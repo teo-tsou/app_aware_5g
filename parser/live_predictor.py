@@ -433,6 +433,8 @@ def post_slice(yhat,verbose=2):
     # If we find Web-rtc app(s), we must raise the 
     # percentage(s) of the corresponding UEs
 
+
+    ### Web-RTC ###
     # UE1
     if 'UE1: web-rtc' in predicted and curr_slices[0]==8:
         need_post = 1
@@ -466,17 +468,17 @@ def post_slice(yhat,verbose=2):
         print('----------------------------------')
         print('|      Actions:      ')
         print("|      -----------------      ")
-        if raise_UE1 == 1:
+        if slice0 == 40:
             print('|      UE1 -> Big Percentage')
         else:
             print('|      UE1 -> Normal Percentage')
 
-        if raise_UE2 == 1:
+        if slice1 == 40:
             print('|      UE2 -> Big Percentage')
         else:
             print('|      UE2 -> Normal Percentage')
 
-        if raise_UE3 == 1:
+        if slice2 == 40:
             print('|      UE3 -> Big Percentage')
         else:
             print('|      UE3 -> Normal Percentage')
