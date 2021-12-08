@@ -398,6 +398,8 @@ def predict(X_scaled,max_mws,verbose=2):
 
 def post_slice(yhat,verbose=2):
     # make a policy based on yhat
+    need_post = 0
+
 
     ue_app_pairs = ['UE1: web-rtc','UE1: sipp','UE1: web-server','UE2: web-rtc','UE2: sipp',
                 'UE2: web-server','UE3: web-rtc','UE3: sipp','UE3: web-server']
@@ -421,38 +423,38 @@ def post_slice(yhat,verbose=2):
     if verbose == 2:
         print('----------------------------------')
 
+
+    # GET slices percentage
+    curr_slices = get_slices()
+
+
     ### decide slicing policy
     # We want to investigate the predictions
     # If we find Web-rtc app(s), we must raise the 
     # percentage(s) of the corresponding UEs
 
-    # UE 1
-    if 'UE1: web-rtc' in predicted and raise_UE1==0:
+    # UE1
+    if 'UE1: web-rtc' in predicted and curr_slices[0]==8:
         need_post = 1
-        raise_UE1 = 1
         slice0 = 40
-    elif 'UE1: web-rtc' not in predicted and raise_UE1==1:
+    elif 'UE1: web-rtc' not in predicted and curr_slices[0]==40:
         need_post = 1
-        raise_UE1 = 0
         slice0 = 8
 
     # UE2
-    if 'UE2: web-rtc' in predicted and raise_UE2==0:
+    if 'UE2: web-rtc' in predicted and curr_slices[1]==8:
         need_post = 1
-        raise_UE2 = 1
         slice1 = 40
-    elif 'UE2: web-rtc' not in predicted and raise_UE2==1:
+    elif 'UE2: web-rtc' not in predicted and curr_slices[1]==40:
         need_post = 1
-        raise_UE2 = 0
         slice1 = 8
+
     # UE3
-    if 'UE3: web-rtc' in predicted and raise_UE3==0:
+    if 'UE3: web-rtc' in predicted and curr_slices[2]==8:
         need_post = 1
-        raise_UE3 = 1
         slice2 = 40
-    elif 'UE3: web-rtc' not in predicted and raise_UE3==1:
+    elif 'UE3: web-rtc' not in predicted and curr_slices[2]==40:
         need_post = 1
-        raise_UE3 = 0
         slice2 = 8
 
     if need_post == 1:
@@ -527,6 +529,42 @@ def store_mini_window(file_name, mw_dict):
                 f.write(",")
         
     f.close()
+
+def get_slices():
+
+    URL = "http://192.168.18.202:9999/stats/"
+
+    ### ~~~ GET ~~~ ###
+    # sending get request and saving the response as respo$
+    r = requests.get(url = URL)
+    
+    # extracting data in json format 
+    data = r.json()
+
+    # Find every instance of `wbCqi` in a Python dictionar$
+    slices = json_extract(data, 'dlSliceId')
+
+    return slices 
+
+def json_extract(obj, key):
+    """Recursively fetch values from nested JSON."""
+    arr = []
+
+    def extract(obj, arr, key):
+        """Recursively search for values of key in JSON tree."""
+        if isinstance(obj, dict):
+            for k, v in obj.items():
+                if isinstance(v, (dict, list)):
+                    extract(v, arr, key)
+                elif k == key:
+                    arr.append(v)
+        elif isinstance(obj, list):
+            for item in obj:
+                extract(item, arr, key)
+        return arr
+
+    values = extract(obj, arr, key)
+    return values
 
 
 def post_configure(slice0, slice1, slice2):
