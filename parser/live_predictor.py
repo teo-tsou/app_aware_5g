@@ -722,6 +722,9 @@ def post_assoc(rnti):
 
     #     r = requests.post(url = API_ENDPOINT, json = assoc2) 
 
+        
+
+
 
 def init_slice(ues=3,slice0=8,slice1=8,slice2=8):
     rnti = rnti_parser(ues)
