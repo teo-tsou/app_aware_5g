@@ -2,14 +2,14 @@ import pandas as pd
 import numpy as np
 from numpy import array
 import time
-from keras.models import load_model
+#from keras.models import load_model
 import sys
 import json
-import requests
+#import requests
 from sqlalchemy import create_engine
 
 
-def packet_parser(mini_window_duration=1, max_mws=30, mode=0, verbose=0, file_name="/mnt/exp.csv"):
+def packet_parser(mini_window_duration=1, max_mws=30, mode=0, verbose=0, file_name="exp.csv"):
     """
     This funtion sniffs and stored continously the filtered packets. 
     When the time come it starts predicting on a standard time interval.
@@ -79,16 +79,16 @@ def packet_parser(mini_window_duration=1, max_mws=30, mode=0, verbose=0, file_na
         if packet.Source == '192.168.20.4' or packet.Destination == '192.168.20.4' :
             ue = 'UE3'
 
-        times.append(packet.Time)
+        times.append(packet.Time_packet)
         ue_apps.append(str(ue) + ": " + str(app))
         lengths.append(eval(packet.Length_packet))
 
         # for first time set time of first packet
         if mw_time_start == -1:
-            mw_time_start = eval(packet.Time)
+            mw_time_start = eval(packet.Time_packet)
 
         # check time
-        mw_time_end = eval(packet.Time)
+        mw_time_end = eval(packet.Time_packet)
 
         # check if mini window duration passed and we are ready to analyze mini window
         if mw_time_end - mw_time_start >= mini_window_duration and mw_time_start != -1:
@@ -373,6 +373,8 @@ def store_mini_window(file_name, mw_dict):
         
     f.close()
 
+if __name__ == "__main__":
+    packet_parser(mini_window_duration=1, max_mws=5, mode=0)
 
 
 
