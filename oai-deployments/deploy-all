@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+#path=$1
+path="/home/ubuntu/oai-ml/"
+
+#echo {\n "insecure-registries" : ["194.177.207.79:5000"]\n} > /etc/docker/daemon.json
+kubectl create secret docker-registry  regcred --docker-server=194.177.207.79:5000 --docker-username=admin --docker-password=password
+kubectl create namespace oai
+
+#Install Multus CNI (Daemonset method)
+#git clone https://github.com/intel/multus-cni.git && cd multus-cni
+#cat ./images/multus-daemonset.yml | kubectl apply -f -
+
+
+kubectl apply -f cassandra.yaml --validate=false
+sleep 5
+kubectl apply -f "${path}oai-hss-devel.yaml" --validate=false
+sleep 28
+kubectl apply -f "${path}oai-mme-devel.yaml" --validate=false
+kubectl create -f "${path}flexran-v2.1.1.yaml" --validate=false
+sleep 8
+kubectl apply -f "${path}oai-spgwc-devel.yaml" --validate=false
+sleep 8
+kubectl apply -f "${path}oai-spgwu-devel.yaml" --validate=false
+sleep 10
+kubectl create -f "${path}web-rtc.yaml" --validate=false
+kubectl create -f "${path}sipp.yaml" --validate=false
+kubectl create -f "${path}web-server.yaml" --validate=false
+kubectl create -f "${path}oai-cu.yaml" --validate=false
+sleep 5
+kubectl create -f "${path}oai-du.yaml" --validate=false
+
