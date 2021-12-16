@@ -100,7 +100,7 @@ spec:
       labels:
         app: oai-mme
     spec:
-      nodeName: worker1
+      nodeName: cloud-worker
       containers:
       - env:
         - name: MME_SERVICE
@@ -199,7 +199,7 @@ spec:
         -  /opt/oai-mme/bin/entrypoint.sh; 
            /usr/bin/sleep 2;
            /opt/oai-mme/bin/mme -c /opt/oai-mme/etc/mme.conf;
-        imagePullPolicy: Always
+        imagePullPolicy: Never
         name: mme
         securityContext:
           privileged: true

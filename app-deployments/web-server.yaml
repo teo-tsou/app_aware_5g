@@ -18,11 +18,11 @@ spec:
       labels:
         app: web-server
     spec:
-      nodeName: worker2
+      nodeName: antenna-worker
       containers:
       - name: web-server
         image: ttsourdinis/web-server
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Never
         securityContext:
               privileged: true
         ports:

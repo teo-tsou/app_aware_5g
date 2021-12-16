@@ -69,11 +69,11 @@ spec:
   template:
     metadata:
       annotations:
-        k8s.v1.cni.cncf.io/networks: spgwu-net1, spgwu-net2, spgwu-net3
+        k8s.v1.cni.cncf.io/networks: spgwu-net1, spgwu-net2, spgwu-net3, spgwu-net4
       labels:
         app: oai-spgwu
     spec:
-      nodeName: worker1
+      nodeName: cloud-worker
       volumes:
         - name: apps-pvc
           persistentVolumeClaim:
@@ -115,15 +115,12 @@ spec:
         command: ["/bin/sh", "-c"]
         args:
         - /opt/oai-spgwu/bin/entrypoint.sh ; 
-          /usr/bin/sleep 2; 
-          tcpdump -i net3 net 192.168.20.0/24 -w /mnt/traffic.pcap & 
+          /usr/bin/sleep 2;  
           /opt/oai-spgwu/bin/spgwu -c /opt/oai-spgwu/etc/spgw_u.conf -o ;
         
-        volumeMounts:
-          - mountPath: "/mnt"
-            name: apps-pvc
 
-        imagePullPolicy: Always
+
+        imagePullPolicy: Never
         name: spgwu
         ports:
         - containerPort: 8805
@@ -132,13 +129,21 @@ spec:
           name: s11
         securityContext:
           privileged: true
-      imagePullSecrets:
-      - name: regcred
-      - command:
-        - /bin/sleep
-        - infinity
-        image: corfr/tcpdump
-        name: tcpdump
+
+      - command: ["/bin/sh", "-c"]
+        args:
+        - while true;
+          do sleep 30;
+          done;
+        image: ttsourdinis/oai-parser:latest
+        securityContext:
+          privileged: true
+        name: predictor
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+          - mountPath: "/mnt"
+            name: apps-pvc
+
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
@@ -174,4 +179,15 @@ metadata:
 spec:
   config: '{ "cniVersion": "0.3.0", "type": "macvlan", "master": "br0", "ipam": { "type": "static", "addresses": [ { "address": "192.168.3.100/24",
     "gateway": "192.168.3.1" } ] } }'
+
+---
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: spgwu-net4
+  namespace: oai
+spec:
+  config: '{ "cniVersion": "0.3.0", "type": "macvlan", "master": "br0", "ipam": { "type": "static", "addresses": [ { "address": "192.168.18.210/24",
+    "gateway": "192.168.18.1" } ] } }'
+
 

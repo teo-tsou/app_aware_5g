@@ -17,10 +17,11 @@ spec:
         app: web-rtc
         run: web-rtc
     spec:
-      nodeName: worker2
+      nodeName: antenna-worker
       containers:
         - name: web-rtc
           image: ttsourdinis/webrtc
+          imagePullPolicy: Never
           securityContext:
               privileged: true
           command: ["/bin/sh", "-c"]
@@ -37,6 +38,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: web-rtc-svc
+  namespace: oai
 spec:
   type: NodePort
   selector:
@@ -47,7 +49,7 @@ spec:
       targetPort: 8000
       # Optional field
       # By default and for convenience, the Kubernetes control plane will allocate a port from a range (default: 30000-32767)
-      nodePort: 30001
+      nodePort: 30002
 
 
 ---

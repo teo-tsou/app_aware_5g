@@ -17,11 +17,11 @@ spec:
         app: sipp-server
         run: sipp-server
     spec:
-      nodeName: worker2
+      nodeName: antenna-worker
       containers:
         - name: sipp-server
           image: ttsourdinis/sipp
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Never
           securityContext:
               privileged: true
           command: ["/bin/sh", "-c"]

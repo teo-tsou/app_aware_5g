@@ -18,14 +18,14 @@ spec:
     spec:
       containers:
         - name: flexran
-          image: ttsourdinis/flexran-agent
+          image: ttsourdinis/flexran-agent:v2.2.1
           imagePullPolicy: IfNotPresent
           securityContext:
             privileged: true
           command: ["/bin/sh", "-c"]
           args:
-          -  cd /projects/mosaic5g/flexran/;
-             ./run_flexran_rtc.sh 
+          -  cd /projects/flexran-rtc/;
+             ./run_flexran_rtc.sh
              while true;
              do sleep 30;
              done;

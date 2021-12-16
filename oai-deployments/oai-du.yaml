@@ -16,7 +16,7 @@ spec:
         app: oai-du
         run: oai-du
     spec:
-      nodeName: worker2
+      nodeName: antenna-worker
       containers:
         - name: oai-du
           volumeMounts:
@@ -24,15 +24,15 @@ spec:
               name: oai-du-usb
             - mountPath: /lib/modules
               name: oai-du-modules
-          image: ttsourdinis/mec-cu-du:multi-ue
-          imagePullPolicy: IfNotPresent
+          image: ttsourdinis/oai-build
           securityContext:
             privileged: true
-          command: ["/bin/sh", "-c"]
+          command: ["/bin/bash", "-c"]
           args:
-          -  uhd_usrp_probe;
-             sleep 2;
-             /root/oai-wifi/targets/bin/./lte-softmodem.Rel14 -O /du.conf;
+          -  export UHD_IMAGES_DIR=/usr/share/uhd/images;
+             uhd_usrp_probe;
+             sleep 3;
+             /openairinterface5g/targets/bin/./lte-softmodem.Rel14 -O /du.conf;
              while true;
              do sleep 30;
              done;
@@ -40,11 +40,11 @@ spec:
         - name: oai-du-usb
           hostPath:
               path: /dev/bus/usb
-
+        
         - name: oai-du-modules
           hostPath:
               path: /lib/modules
-
+              
 ---
 apiVersion: k8s.cni.cncf.io/v1
 kind: NetworkAttachmentDefinition
@@ -54,6 +54,5 @@ metadata:
 spec:
   config: '{ "cniVersion": "0.3.0", "type": "macvlan", "master": "br0", "ipam": { "type": "static", "addresses": [ { "address": "192.168.18.205/24",
     "gateway": "192.168.18.1" } ] } }'
-
-
-
+    
+    

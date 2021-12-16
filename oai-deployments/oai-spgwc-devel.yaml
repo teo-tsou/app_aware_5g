@@ -71,7 +71,7 @@ spec:
       labels:
         app: oai-spgwc
     spec:
-      nodeName: worker1
+      nodeName: cloud-worker
       containers:
       - env:
         - name: PGW_SX_INTERFACE
@@ -98,7 +98,7 @@ spec:
         command: ["/bin/sh", "-c"]
         args: 
         - "/opt/oai-spgwc/bin/entrypoint.sh ; /usr/bin/sleep 2; /opt/oai-spgwc/bin/spgwc -c /opt/oai-spgwc/etc/spgw_c.conf -o"
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Never
         name: spgwc
         ports:
         - containerPort: 8805

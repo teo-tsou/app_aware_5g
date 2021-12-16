@@ -85,7 +85,7 @@ spec:
       labels:
         app: oai-hss
     spec:
-      nodeName: worker1
+      nodeName: cloud-worker
       containers:
       - env:
         - name: HOSTNAME
@@ -132,7 +132,7 @@ spec:
         command: ["/bin/sh", "-c"]
         args:
         - "/opt/oai-hss/bin/entrypoint.sh ; /usr/bin/sleep 2 ; /opt/oai-hss/bin/oai_hss -j /opt/oai-hss/etc/hss_rel14.json ;"
-        imagePullPolicy: Always
+        imagePullPolicy: Never
         name: hss
         ports:
         - containerPort: 3868
