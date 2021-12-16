@@ -7,9 +7,14 @@ import sys
 import json
 #import requests
 from sqlalchemy import create_engine
+import argparse
+from pathlib import Path
 
 
-def packet_parser(mini_window_duration=1, max_mws=30, mode=0, verbose=0, file_name="exp.csv"):
+
+
+
+def packet_parser(args,mini_window_duration=1, max_mws=30, mode=0, verbose=0, file_name="/dataset.csv"):
     """
     This funtion sniffs and stored continously the filtered packets. 
     When the time come it starts predicting on a standard time interval.
@@ -266,7 +271,13 @@ def packet_parser(mini_window_duration=1, max_mws=30, mode=0, verbose=0, file_na
 
             elif mw_num > max_mws:
                 print("[ERROR]: Mini-windows surpassed max limit!")
-                exit()    
+                exit()
+
+    df = pd.read_csv(file_name)
+    dict = df.to_dict('list')
+    with open(args.data, 'w') as out_file:
+        json.dump(dict, out_file)
+
     return           
 
 
@@ -374,7 +385,21 @@ def store_mini_window(file_name, mw_dict):
     f.close()
 
 if __name__ == "__main__":
-    packet_parser(mini_window_duration=1, max_mws=5, mode=0)
+    
+    # This component does not receive any input
+    # it only outpus one artifact which is `data`.
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--data', type=str)
+    
+    args = parser.parse_args()
+    
+    # Creating the directory where the output file will be created 
+    # (the directory may or may not exist).
+    Path(args.data).parent.mkdir(parents=True, exist_ok=True)
+
+    packet_parser(args,mini_window_duration=1, max_mws=5, mode=0)
+
+    
 
 
 

@@ -1,0 +1,25 @@
+name: Data Pre
+description: Data Preprocessing
+
+inputs:
+- {name: Data, type: LocalPath, description: 'Path where data is stored.'}
+
+outputs:
+- {name: Array_x, type: LocalPath, description: 'Path where data will be stored.'}
+- {name: Array_y, type: LocalPath, description: 'Path where data will be stored.'}
+
+implementation:
+  container:
+    image: ttsourdinis/oai-parser
+    command: [
+      python3, step2.py,
+
+      --data,
+      {inputPath: Data},
+
+      --out_x,
+      {outputPath: Array_x},
+
+      --out_y,
+      {outputPath: Array_y}
+    ]
