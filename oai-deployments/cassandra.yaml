@@ -1,0 +1,176 @@
+apiVersion: v1
+data:
+  cassandra.cluster_name: OAI_HSS
+  cassandra.dc: DC1
+  cassandra.endpoint_snitch: GossipingPropertyFileSnitch
+  cassandra.rack: RACK1
+kind: ConfigMap
+metadata:
+  name: cassandra-config
+  namespace: oai
+---
+apiVersion: v1
+data:
+  oai_db.cql: "CREATE KEYSPACE IF NOT EXISTS vhss WITH replication = {'class': 'NetworkTopologyStrategy',
+    'DC1': '1'};\nCREATE TABLE IF NOT EXISTS vhss.users_imsi (\n    imsi text PRIMARY
+    KEY,\n    access_restriction int,\n    idmmeidentity int,\n    imei text,\n    imei_sv
+    text,\n    key text,\n    lipa_permissions text,\n    mme_cap int,\n    mmehost
+    text,\n    mmeidentity_idmmeidentity int,\n    mmerealm text,\n    ms_ps_status
+    text,\n    msisdn bigint,\n    niddvalidity text,\n    nir_dest_host text,\n    nir_dest_realm
+    text,\n    opc text,\n    pgw_id int,\n    rand text,\n    rfsp_index varint,\n
+    \   sqn bigint,\n    subscription_data text,\n    ue_reachability varint,\n    urrp_mme
+    varint,\n    user_identifier text,\n    visited_plmnid text);\nCREATE TABLE IF
+    NOT EXISTS vhss.msisdn_imsi (\n\tmsisdn bigint PRIMARY KEY,\n\timsi text\n);\nCREATE
+    TABLE IF NOT EXISTS vhss.global_ids (\n    table_name text PRIMARY KEY,\n    id
+    counter);\nCREATE TABLE IF NOT EXISTS vhss.mmeidentity_host (\n    mmehost text
+    PRIMARY KEY,\n    idmmeidentity int,\n    mmerealm text,\n    ue_reachability
+    varint,\n    mmeisdn text);\nCREATE TABLE IF NOT EXISTS vhss.mmeidentity (\n    idmmeidentity
+    int PRIMARY KEY,\n    mmehost text,\n    mmerealm text,\n    ue_reachability varint,\n
+    \   mmeisdn text);\nCREATE TABLE IF NOT EXISTS vhss.events (\n    scef_id text,\n
+    \   scef_ref_id bigint,\n    extid text,\n    monitoring_event_configuration text,\n
+    \   monitoring_type int,\n    msisdn bigint,\n    user_identifier text,\n    primary
+    key (scef_id, scef_ref_id)\n);\nCREATE TABLE IF NOT EXISTS vhss.events_msisdn
+    (\n    msisdn bigint,\n    scef_id text,\n    scef_ref_id bigint,\n    primary
+    key (msisdn, scef_id, scef_ref_id)\n);\nCREATE TABLE IF NOT EXISTS vhss.events_extid
+    (\n    extid text,\n    scef_id text,\n    scef_ref_id bigint,\n    primary key
+    (extid, scef_id, scef_ref_id)\n);\nCREATE TABLE IF NOT EXISTS vhss.extid (\n    extid
+    text primary key\n);\nCREATE TABLE IF NOT EXISTS vhss.extid_imsi (\n    extid
+    text,\n    imsi text,\n    primary key (extid, imsi)\n);\nCREATE TABLE IF NOT
+    EXISTS vhss.extid_imsi_xref (\n    imsi text,\n    extid text,\n    primary key
+    (imsi, extid)\n);\nINSERT into vhss.mmeidentity JSON '{\"idmmeidentity\":\"1\",\"mmeisdn\":\"mme-isdn\",
+    \"mmehost\":\"oai-mme.oai.svc.cluster.local\", \"mmerealm\":\"oai.svc.cluster.local\",
+    \"ue_reachability\":\"1\"}';\nINSERT into vhss.mmeidentity_host JSON '{\"idmmeidentity\":\"1\",\"mmeisdn\":\"mme-isdn\",
+    \"mmehost\":\"oai-mme.oai.svc.cluster.local\", \"mmerealm\":\"oai.svc.cluster.local\",
+    \"ue_reachability\":\"1\"}';\nINSERT INTO vhss.users_imsi (imsi, msisdn, access_restriction,
+    key, mmehost, mmeidentity_idmmeidentity, mmerealm, rand, sqn, subscription_data)
+    VALUES ('208920100001110', 0033663000021, 41, '8baf473f2f8fd09487cccbd7097c6862',
+    'oai-mme.oai.svc.cluster.local', 4, 'oai.svc.cluster.local', '2683b376d1056746de3b254012908e0e',
+    96, '{\"Subscription-Data\":{\"Access-Restriction-Data\":41,\"Subscriber-Status\":0,\"Network-Access-Mode\":2,\"Regional-Subscription-Zone-Code\":[\"0x0123\",\"0x4567\",\"0x89AB\",\"0xCDEF\",\"0x1234\",\"0x5678\",\"0x9ABC\",\"0xDEF0\",\"0x2345\",\"0x6789\"],\"MSISDN\":\"0x0033663000021\",\"AMBR\":{\"Max-Requested-Bandwidth-UL\":50000000,\"Max-Requested-Bandwidth-DL\":100000000},\"APN-Configuration-Profile\":{\"Context-Identifier\":0,\"All-APN-Configurations-Included-Indicator\":0,\"APN-Configuration\":{\"Context-Identifier\":0,\"PDN-Type\":0,\"Served-Party-IP-Address\":[\"10.0.0.1\",\"10.0.0.2\"],\"Service-Selection\":\"apn.oai.svc.cluster.local\",\"EPS-Subscribed-QoS-Profile\":{\"QoS-Class-Identifier\":9,\"Allocation-Retention-Priority\":{\"Priority-Level\":15,\"Pre-emption-Capability\":0,\"Pre-emption-Vulnerability\":0}},\"AMBR\":{\"Max-Requested-Bandwidth-UL\":50000000,\"Max-Requested-Bandwidth-DL\":100000000},\"PDN-GW-Allocation-Type\":0,\"MIP6-Agent-Info\":{\"MIP-Home-Agent-Address\":[\"172.26.17.183\"]}}},\"Subscribed-Periodic-RAU-TAU-Timer\":0}}');\nINSERT
+    INTO vhss.users_imsi (imsi, msisdn, access_restriction, key, mmehost, mmeidentity_idmmeidentity,
+    mmerealm, rand, sqn, subscription_data) VALUES ('208920100001111', 0033663000021,
+    41, '8baf473f2f8fd09487cccbd7097c6862', 'oai-mme.oai.svc.cluster.local', 4, 'oai.svc.cluster.local',
+    '2683b376d1056746de3b254012908e0e', 96, '{\"Subscription-Data\":{\"Access-Restriction-Data\":41,\"Subscriber-Status\":0,\"Network-Access-Mode\":2,\"Regional-Subscription-Zone-Code\":[\"0x0123\",\"0x4567\",\"0x89AB\",\"0xCDEF\",\"0x1234\",\"0x5678\",\"0x9ABC\",\"0xDEF0\",\"0x2345\",\"0x6789\"],\"MSISDN\":\"0x0033663000021\",\"AMBR\":{\"Max-Requested-Bandwidth-UL\":50000000,\"Max-Requested-Bandwidth-DL\":100000000},\"APN-Configuration-Profile\":{\"Context-Identifier\":0,\"All-APN-Configurations-Included-Indicator\":0,\"APN-Configuration\":{\"Context-Identifier\":0,\"PDN-Type\":0,\"Served-Party-IP-Address\":[\"10.0.0.1\",\"10.0.0.2\"],\"Service-Selection\":\"apn.oai.svc.cluster.local\",\"EPS-Subscribed-QoS-Profile\":{\"QoS-Class-Identifier\":9,\"Allocation-Retention-Priority\":{\"Priority-Level\":15,\"Pre-emption-Capability\":0,\"Pre-emption-Vulnerability\":0}},\"AMBR\":{\"Max-Requested-Bandwidth-UL\":50000000,\"Max-Requested-Bandwidth-DL\":100000000},\"PDN-GW-Allocation-Type\":0,\"MIP6-Agent-Info\":{\"MIP-Home-Agent-Address\":[\"172.26.17.183\"]}}},\"Subscribed-Periodic-RAU-TAU-Timer\":0}}');\nINSERT
+    INTO vhss.users_imsi (imsi, msisdn, access_restriction, key, mmehost, mmeidentity_idmmeidentity,
+    mmerealm, rand, sqn, subscription_data) VALUES ('208930000000001', 0033663000021,
+    41, '8baf473f2f8fd09487cccbd7097c6862', 'oai-mme.oai.svc.cluster.local', 4, 'oai.svc.cluster.local',
+    '2683b376d1056746de3b254012908e0e', 96, '{\"Subscription-Data\":{\"Access-Restriction-Data\":41,\"Subscriber-Status\":0,\"Network-Access-Mode\":2,\"Regional-Subscription-Zone-Code\":[\"0x0123\",\"0x4567\",\"0x89AB\",\"0xCDEF\",\"0x1234\",\"0x5678\",\"0x9ABC\",\"0xDEF0\",\"0x2345\",\"0x6789\"],\"MSISDN\":\"0x0033663000021\",\"AMBR\":{\"Max-Requested-Bandwidth-UL\":50000000,\"Max-Requested-Bandwidth-DL\":100000000},\"APN-Configuration-Profile\":{\"Context-Identifier\":0,\"All-APN-Configurations-Included-Indicator\":0,\"APN-Configuration\":{\"Context-Identifier\":0,\"PDN-Type\":0,\"Served-Party-IP-Address\":[\"10.0.0.1\",\"10.0.0.2\"],\"Service-Selection\":\"apn.oai.svc.cluster.local\",\"EPS-Subscribed-QoS-Profile\":{\"QoS-Class-Identifier\":9,\"Allocation-Retention-Priority\":{\"Priority-Level\":15,\"Pre-emption-Capability\":0,\"Pre-emption-Vulnerability\":0}},\"AMBR\":{\"Max-Requested-Bandwidth-UL\":50000000,\"Max-Requested-Bandwidth-DL\":100000000},\"PDN-GW-Allocation-Type\":0,\"MIP6-Agent-Info\":{\"MIP-Home-Agent-Address\":[\"172.26.17.183\"]}}},\"Subscribed-Periodic-RAU-TAU-Timer\":0}}');\nINSERT
+    INTO vhss.users_imsi (imsi, msisdn, access_restriction, key, mmehost, mmeidentity_idmmeidentity,
+    mmerealm, rand, sqn, subscription_data) VALUES ('460990010001003', 0033663000021,
+    41, '000102030405060708090A0B0C0D0E0F', 'oai-mme.oai.svc.cluster.local', 4, 'oai.svc.cluster.local',
+    '2683b376d1056746de3b254012908e0e', 96, '{\"Subscription-Data\":{\"Access-Restriction-Data\":41,\"Subscriber-Status\":0,\"Network-Access-Mode\":2,\"Regional-Subscription-Zone-Code\":[\"0x0123\",\"0x4567\",\"0x89AB\",\"0xCDEF\",\"0x1234\",\"0x5678\",\"0x9ABC\",\"0xDEF0\",\"0x2345\",\"0x6789\"],\"MSISDN\":\"0x0033663000021\",\"AMBR\":{\"Max-Requested-Bandwidth-UL\":50000000,\"Max-Requested-Bandwidth-DL\":100000000},\"APN-Configuration-Profile\":{\"Context-Identifier\":0,\"All-APN-Configurations-Included-Indicator\":0,\"APN-Configuration\":{\"Context-Identifier\":0,\"PDN-Type\":0,\"Served-Party-IP-Address\":[\"10.0.0.1\",\"10.0.0.2\"],\"Service-Selection\":\"apn.oai.svc.cluster.local\",\"EPS-Subscribed-QoS-Profile\":{\"QoS-Class-Identifier\":9,\"Allocation-Retention-Priority\":{\"Priority-Level\":15,\"Pre-emption-Capability\":0,\"Pre-emption-Vulnerability\":0}},\"AMBR\":{\"Max-Requested-Bandwidth-UL\":50000000,\"Max-Requested-Bandwidth-DL\":100000000},\"PDN-GW-Allocation-Type\":0,\"MIP6-Agent-Info\":{\"MIP-Home-Agent-Address\":[\"172.26.17.183\"]}}},\"Subscribed-Periodic-RAU-TAU-Timer\":0}}');\nINSERT
+    INTO vhss.users_imsi (imsi, msisdn, access_restriction, key, mmehost, mmeidentity_idmmeidentity,
+    mmerealm, rand, sqn, subscription_data) VALUES ('460990010001006', 0033663000021,
+    41, '000102030405060708090A0B0C0D0E0F', 'oai-mme.oai.svc.cluster.local', 4, 'oai.svc.cluster.local',
+    '2683b376d1056746de3b254012908e0e', 96, '{\"Subscription-Data\":{\"Access-Restriction-Data\":41,\"Subscriber-Status\":0,\"Network-Access-Mode\":2,\"Regional-Subscription-Zone-Code\":[\"0x0123\",\"0x4567\",\"0x89AB\",\"0xCDEF\",\"0x1234\",\"0x5678\",\"0x9ABC\",\"0xDEF0\",\"0x2345\",\"0x6789\"],\"MSISDN\":\"0x0033663000021\",\"AMBR\":{\"Max-Requested-Bandwidth-UL\":50000000,\"Max-Requested-Bandwidth-DL\":100000000},\"APN-Configuration-Profile\":{\"Context-Identifier\":0,\"All-APN-Configurations-Included-Indicator\":0,\"APN-Configuration\":{\"Context-Identifier\":0,\"PDN-Type\":0,\"Served-Party-IP-Address\":[\"10.0.0.1\",\"10.0.0.2\"],\"Service-Selection\":\"apn.oai.svc.cluster.local\",\"EPS-Subscribed-QoS-Profile\":{\"QoS-Class-Identifier\":9,\"Allocation-Retention-Priority\":{\"Priority-Level\":15,\"Pre-emption-Capability\":0,\"Pre-emption-Vulnerability\":0}},\"AMBR\":{\"Max-Requested-Bandwidth-UL\":50000000,\"Max-Requested-Bandwidth-DL\":100000000},\"PDN-GW-Allocation-Type\":0,\"MIP6-Agent-Info\":{\"MIP-Home-Agent-Address\":[\"172.26.17.183\"]}}},\"Subscribed-Periodic-RAU-TAU-Timer\":0}}');\nINSERT
+    INTO vhss.users_imsi (imsi, msisdn, access_restriction, key, mmehost, mmeidentity_idmmeidentity,
+    mmerealm, rand, sqn, subscription_data) VALUES ('460990010001009', 0033663000021,
+    41, '000102030405060708090A0B0C0D0E0F', 'oai-mme.oai.svc.cluster.local', 4, 'oai.svc.cluster.local',
+    '2683b376d1056746de3b254012908e0e', 96, '{\"Subscription-Data\":{\"Access-Restriction-Data\":41,\"Subscriber-Status\":0,\"Network-Access-Mode\":2,\"Regional-Subscription-Zone-Code\":[\"0x0123\",\"0x4567\",\"0x89AB\",\"0xCDEF\",\"0x1234\",\"0x5678\",\"0x9ABC\",\"0xDEF0\",\"0x2345\",\"0x6789\"],\"MSISDN\":\"0x0033663000021\",\"AMBR\":{\"Max-Requested-Bandwidth-UL\":50000000,\"Max-Requested-Bandwidth-DL\":100000000},\"APN-Configuration-Profile\":{\"Context-Identifier\":0,\"All-APN-Configurations-Included-Indicator\":0,\"APN-Configuration\":{\"Context-Identifier\":0,\"PDN-Type\":0,\"Served-Party-IP-Address\":[\"10.0.0.1\",\"10.0.0.2\"],\"Service-Selection\":\"apn.oai.svc.cluster.local\",\"EPS-Subscribed-QoS-Profile\":{\"QoS-Class-Identifier\":9,\"Allocation-Retention-Priority\":{\"Priority-Level\":15,\"Pre-emption-Capability\":0,\"Pre-emption-Vulnerability\":0}},\"AMBR\":{\"Max-Requested-Bandwidth-UL\":50000000,\"Max-Requested-Bandwidth-DL\":100000000},\"PDN-GW-Allocation-Type\":0,\"MIP6-Agent-Info\":{\"MIP-Home-Agent-Address\":[\"172.26.17.183\"]}}},\"Subscribed-Periodic-RAU-TAU-Timer\":0}}');\nINSERT
+    INTO vhss.users_imsi (imsi, msisdn, access_restriction, key, mmehost, mmeidentity_idmmeidentity,
+    mmerealm, rand, sqn, subscription_data) VALUES ('460990010001010', 0033663000021,
+    41, '000102030405060708090A0B0C0D0E0F', 'oai-mme.oai.svc.cluster.local', 4, 'oai.svc.cluster.local',
+    '2683b376d1056746de3b254012908e0e', 96, '{\"Subscription-Data\":{\"Access-Restriction-Data\":41,\"Subscriber-Status\":0,\"Network-Access-Mode\":2,\"Regional-Subscription-Zone-Code\":[\"0x0123\",\"0x4567\",\"0x89AB\",\"0xCDEF\",\"0x1234\",\"0x5678\",\"0x9ABC\",\"0xDEF0\",\"0x2345\",\"0x6789\"],\"MSISDN\":\"0x0033663000021\",\"AMBR\":{\"Max-Requested-Bandwidth-UL\":50000000,\"Max-Requested-Bandwidth-DL\":100000000},\"APN-Configuration-Profile\":{\"Context-Identifier\":0,\"All-APN-Configurations-Included-Indicator\":0,\"APN-Configuration\":{\"Context-Identifier\":0,\"PDN-Type\":0,\"Served-Party-IP-Address\":[\"10.0.0.1\",\"10.0.0.2\"],\"Service-Selection\":\"apn.oai.svc.cluster.local\",\"EPS-Subscribed-QoS-Profile\":{\"QoS-Class-Identifier\":9,\"Allocation-Retention-Priority\":{\"Priority-Level\":15,\"Pre-emption-Capability\":0,\"Pre-emption-Vulnerability\":0}},\"AMBR\":{\"Max-Requested-Bandwidth-UL\":50000000,\"Max-Requested-Bandwidth-DL\":100000000},\"PDN-GW-Allocation-Type\":0,\"MIP6-Agent-Info\":{\"MIP-Home-Agent-Address\":[\"172.26.17.183\"]}}},\"Subscribed-Periodic-RAU-TAU-Timer\":0}}');\nINSERT
+    INTO vhss.users_imsi (imsi, msisdn, access_restriction, key, mmehost, mmeidentity_idmmeidentity,
+    mmerealm, rand, sqn, subscription_data) VALUES ('460990010001011', 0033663000021,
+    41, '000102030405060708090A0B0C0D0E0F', 'oai-mme.oai.svc.cluster.local', 4, 'oai.svc.cluster.local',
+    '2683b376d1056746de3b254012908e0e', 96, '{\"Subscription-Data\":{\"Access-Restriction-Data\":41,\"Subscriber-Status\":0,\"Network-Access-Mode\":2,\"Regional-Subscription-Zone-Code\":[\"0x0123\",\"0x4567\",\"0x89AB\",\"0xCDEF\",\"0x1234\",\"0x5678\",\"0x9ABC\",\"0xDEF0\",\"0x2345\",\"0x6789\"],\"MSISDN\":\"0x0033663000021\",\"AMBR\":{\"Max-Requested-Bandwidth-UL\":50000000,\"Max-Requested-Bandwidth-DL\":100000000},\"APN-Configuration-Profile\":{\"Context-Identifier\":0,\"All-APN-Configurations-Included-Indicator\":0,\"APN-Configuration\":{\"Context-Identifier\":0,\"PDN-Type\":0,\"Served-Party-IP-Address\":[\"10.0.0.1\",\"10.0.0.2\"],\"Service-Selection\":\"apn.oai.svc.cluster.local\",\"EPS-Subscribed-QoS-Profile\":{\"QoS-Class-Identifier\":9,\"Allocation-Retention-Priority\":{\"Priority-Level\":15,\"Pre-emption-Capability\":0,\"Pre-emption-Vulnerability\":0}},\"AMBR\":{\"Max-Requested-Bandwidth-UL\":50000000,\"Max-Requested-Bandwidth-DL\":100000000},\"PDN-GW-Allocation-Type\":0,\"MIP6-Agent-Info\":{\"MIP-Home-Agent-Address\":[\"172.26.17.183\"]}}},\"Subscribed-Periodic-RAU-TAU-Timer\":0}}');\nINSERT
+    INTO vhss.users_imsi (imsi, msisdn, access_restriction, key, mmehost, mmeidentity_idmmeidentity,
+    mmerealm, rand, sqn, subscription_data) VALUES ('460990010001013', 0033663000021,
+    41, '000102030405060708090A0B0C0D0E0F', 'oai-mme.oai.svc.cluster.local', 4, 'oai.svc.cluster.local',
+    '2683b376d1056746de3b254012908e0e', 96, '{\"Subscription-Data\":{\"Access-Restriction-Data\":41,\"Subscriber-Status\":0,\"Network-Access-Mode\":2,\"Regional-Subscription-Zone-Code\":[\"0x0123\",\"0x4567\",\"0x89AB\",\"0xCDEF\",\"0x1234\",\"0x5678\",\"0x9ABC\",\"0xDEF0\",\"0x2345\",\"0x6789\"],\"MSISDN\":\"0x0033663000021\",\"AMBR\":{\"Max-Requested-Bandwidth-UL\":50000000,\"Max-Requested-Bandwidth-DL\":100000000},\"APN-Configuration-Profile\":{\"Context-Identifier\":0,\"All-APN-Configurations-Included-Indicator\":0,\"APN-Configuration\":{\"Context-Identifier\":0,\"PDN-Type\":0,\"Served-Party-IP-Address\":[\"10.0.0.1\",\"10.0.0.2\"],\"Service-Selection\":\"apn.oai.svc.cluster.local\",\"EPS-Subscribed-QoS-Profile\":{\"QoS-Class-Identifier\":9,\"Allocation-Retention-Priority\":{\"Priority-Level\":15,\"Pre-emption-Capability\":0,\"Pre-emption-Vulnerability\":0}},\"AMBR\":{\"Max-Requested-Bandwidth-UL\":50000000,\"Max-Requested-Bandwidth-DL\":100000000},\"PDN-GW-Allocation-Type\":0,\"MIP6-Agent-Info\":{\"MIP-Home-Agent-Address\":[\"172.26.17.183\"]}}},\"Subscribed-Periodic-RAU-TAU-Timer\":0}}');\nINSERT
+    INTO vhss.users_imsi (imsi, msisdn, access_restriction, key, mmehost, mmeidentity_idmmeidentity,
+    mmerealm, rand, sqn, subscription_data) VALUES ('460990010001014', 0033663000021,
+    41, '000102030405060708090A0B0C0D0E0F', 'oai-mme.oai.svc.cluster.local', 4, 'oai.svc.cluster.local',
+    '2683b376d1056746de3b254012908e0e', 96, '{\"Subscription-Data\":{\"Access-Restriction-Data\":41,\"Subscriber-Status\":0,\"Network-Access-Mode\":2,\"Regional-Subscription-Zone-Code\":[\"0x0123\",\"0x4567\",\"0x89AB\",\"0xCDEF\",\"0x1234\",\"0x5678\",\"0x9ABC\",\"0xDEF0\",\"0x2345\",\"0x6789\"],\"MSISDN\":\"0x0033663000021\",\"AMBR\":{\"Max-Requested-Bandwidth-UL\":50000000,\"Max-Requested-Bandwidth-DL\":100000000},\"APN-Configuration-Profile\":{\"Context-Identifier\":0,\"All-APN-Configurations-Included-Indicator\":0,\"APN-Configuration\":{\"Context-Identifier\":0,\"PDN-Type\":0,\"Served-Party-IP-Address\":[\"10.0.0.1\",\"10.0.0.2\"],\"Service-Selection\":\"apn.oai.svc.cluster.local\",\"EPS-Subscribed-QoS-Profile\":{\"QoS-Class-Identifier\":9,\"Allocation-Retention-Priority\":{\"Priority-Level\":15,\"Pre-emption-Capability\":0,\"Pre-emption-Vulnerability\":0}},\"AMBR\":{\"Max-Requested-Bandwidth-UL\":50000000,\"Max-Requested-Bandwidth-DL\":100000000},\"PDN-GW-Allocation-Type\":0,\"MIP6-Agent-Info\":{\"MIP-Home-Agent-Address\":[\"172.26.17.183\"]}}},\"Subscribed-Periodic-RAU-TAU-Timer\":0}}');\nINSERT
+    INTO vhss.users_imsi (imsi, msisdn, access_restriction, key, mmehost, mmeidentity_idmmeidentity,
+    mmerealm, rand, sqn, subscription_data) VALUES ('460990010001018', 0033663000021,
+    41, '000102030405060708090A0B0C0D0E0F', 'oai-mme.oai.svc.cluster.local', 4, 'oai.svc.cluster.local',
+    '2683b376d1056746de3b254012908e0e', 96, '{\"Subscription-Data\":{\"Access-Restriction-Data\":41,\"Subscriber-Status\":0,\"Network-Access-Mode\":2,\"Regional-Subscription-Zone-Code\":[\"0x0123\",\"0x4567\",\"0x89AB\",\"0xCDEF\",\"0x1234\",\"0x5678\",\"0x9ABC\",\"0xDEF0\",\"0x2345\",\"0x6789\"],\"MSISDN\":\"0x0033663000021\",\"AMBR\":{\"Max-Requested-Bandwidth-UL\":50000000,\"Max-Requested-Bandwidth-DL\":100000000},\"APN-Configuration-Profile\":{\"Context-Identifier\":0,\"All-APN-Configurations-Included-Indicator\":0,\"APN-Configuration\":{\"Context-Identifier\":0,\"PDN-Type\":0,\"Served-Party-IP-Address\":[\"10.0.0.1\",\"10.0.0.2\"],\"Service-Selection\":\"apn.oai.svc.cluster.local\",\"EPS-Subscribed-QoS-Profile\":{\"QoS-Class-Identifier\":9,\"Allocation-Retention-Priority\":{\"Priority-Level\":15,\"Pre-emption-Capability\":0,\"Pre-emption-Vulnerability\":0}},\"AMBR\":{\"Max-Requested-Bandwidth-UL\":50000000,\"Max-Requested-Bandwidth-DL\":100000000},\"PDN-GW-Allocation-Type\":0,\"MIP6-Agent-Info\":{\"MIP-Home-Agent-Address\":[\"172.26.17.183\"]}}},\"Subscribed-Periodic-RAU-TAU-Timer\":0}}');\nINSERT
+    INTO vhss.users_imsi (imsi, msisdn, access_restriction, key, mmehost, mmeidentity_idmmeidentity,
+    mmerealm, rand, sqn, subscription_data) VALUES ('460990010001042', 0033663000021,
+    41, '000102030405060708090A0B0C0D0E0F', 'oai-mme.oai.svc.cluster.local', 4, 'oai.svc.cluster.local',
+    '2683b376d1056746de3b254012908e0e', 96, '{\"Subscription-Data\":{\"Access-Restriction-Data\":41,\"Subscriber-Status\":0,\"Network-Access-Mode\":2,\"Regional-Subscription-Zone-Code\":[\"0x0123\",\"0x4567\",\"0x89AB\",\"0xCDEF\",\"0x1234\",\"0x5678\",\"0x9ABC\",\"0xDEF0\",\"0x2345\",\"0x6789\"],\"MSISDN\":\"0x0033663000021\",\"AMBR\":{\"Max-Requested-Bandwidth-UL\":50000000,\"Max-Requested-Bandwidth-DL\":100000000},\"APN-Configuration-Profile\":{\"Context-Identifier\":0,\"All-APN-Configurations-Included-Indicator\":0,\"APN-Configuration\":{\"Context-Identifier\":0,\"PDN-Type\":0,\"Served-Party-IP-Address\":[\"10.0.0.1\",\"10.0.0.2\"],\"Service-Selection\":\"apn.oai.svc.cluster.local\",\"EPS-Subscribed-QoS-Profile\":{\"QoS-Class-Identifier\":9,\"Allocation-Retention-Priority\":{\"Priority-Level\":15,\"Pre-emption-Capability\":0,\"Pre-emption-Vulnerability\":0}},\"AMBR\":{\"Max-Requested-Bandwidth-UL\":50000000,\"Max-Requested-Bandwidth-DL\":100000000},\"PDN-GW-Allocation-Type\":0,\"MIP6-Agent-Info\":{\"MIP-Home-Agent-Address\":[\"172.26.17.183\"]}}},\"Subscribed-Periodic-RAU-TAU-Timer\":0}}');\nINSERT
+    INTO vhss.users_imsi (imsi, msisdn, access_restriction, key, mmehost, mmeidentity_idmmeidentity,
+    mmerealm, rand, sqn, subscription_data) VALUES ('460990010001045', 0033663000021,
+    41, '000102030405060708090A0B0C0D0E0F', 'oai-mme.oai.svc.cluster.local', 4, 'oai.svc.cluster.local',
+    '2683b376d1056746de3b254012908e0e', 96, '{\"Subscription-Data\":{\"Access-Restriction-Data\":41,\"Subscriber-Status\":0,\"Network-Access-Mode\":2,\"Regional-Subscription-Zone-Code\":[\"0x0123\",\"0x4567\",\"0x89AB\",\"0xCDEF\",\"0x1234\",\"0x5678\",\"0x9ABC\",\"0xDEF0\",\"0x2345\",\"0x6789\"],\"MSISDN\":\"0x0033663000021\",\"AMBR\":{\"Max-Requested-Bandwidth-UL\":50000000,\"Max-Requested-Bandwidth-DL\":100000000},\"APN-Configuration-Profile\":{\"Context-Identifier\":0,\"All-APN-Configurations-Included-Indicator\":0,\"APN-Configuration\":{\"Context-Identifier\":0,\"PDN-Type\":0,\"Served-Party-IP-Address\":[\"10.0.0.1\",\"10.0.0.2\"],\"Service-Selection\":\"apn.oai.svc.cluster.local\",\"EPS-Subscribed-QoS-Profile\":{\"QoS-Class-Identifier\":9,\"Allocation-Retention-Priority\":{\"Priority-Level\":15,\"Pre-emption-Capability\":0,\"Pre-emption-Vulnerability\":0}},\"AMBR\":{\"Max-Requested-Bandwidth-UL\":50000000,\"Max-Requested-Bandwidth-DL\":100000000},\"PDN-GW-Allocation-Type\":0,\"MIP6-Agent-Info\":{\"MIP-Home-Agent-Address\":[\"172.26.17.183\"]}}},\"Subscribed-Periodic-RAU-TAU-Timer\":0}}');\nINSERT
+    INTO vhss.users_imsi (imsi, msisdn, access_restriction, key, mmehost, mmeidentity_idmmeidentity,
+    mmerealm, rand, sqn, subscription_data) VALUES ('460990010001046', 0033663000021,
+    41, '000102030405060708090A0B0C0D0E0F', 'oai-mme.oai.svc.cluster.local', 4, 'oai.svc.cluster.local',
+    '2683b376d1056746de3b254012908e0e', 96, '{\"Subscription-Data\":{\"Access-Restriction-Data\":41,\"Subscriber-Status\":0,\"Network-Access-Mode\":2,\"Regional-Subscription-Zone-Code\":[\"0x0123\",\"0x4567\",\"0x89AB\",\"0xCDEF\",\"0x1234\",\"0x5678\",\"0x9ABC\",\"0xDEF0\",\"0x2345\",\"0x6789\"],\"MSISDN\":\"0x0033663000021\",\"AMBR\":{\"Max-Requested-Bandwidth-UL\":50000000,\"Max-Requested-Bandwidth-DL\":100000000},\"APN-Configuration-Profile\":{\"Context-Identifier\":0,\"All-APN-Configurations-Included-Indicator\":0,\"APN-Configuration\":{\"Context-Identifier\":0,\"PDN-Type\":0,\"Served-Party-IP-Address\":[\"10.0.0.1\",\"10.0.0.2\"],\"Service-Selection\":\"apn.oai.svc.cluster.local\",\"EPS-Subscribed-QoS-Profile\":{\"QoS-Class-Identifier\":9,\"Allocation-Retention-Priority\":{\"Priority-Level\":15,\"Pre-emption-Capability\":0,\"Pre-emption-Vulnerability\":0}},\"AMBR\":{\"Max-Requested-Bandwidth-UL\":50000000,\"Max-Requested-Bandwidth-DL\":100000000},\"PDN-GW-Allocation-Type\":0,\"MIP6-Agent-Info\":{\"MIP-Home-Agent-Address\":[\"172.26.17.183\"]}}},\"Subscribed-Periodic-RAU-TAU-Timer\":0}}');\nINSERT
+    INTO vhss.users_imsi (imsi, msisdn, access_restriction, key, mmehost, mmeidentity_idmmeidentity,
+    mmerealm, rand, sqn, subscription_data) VALUES ('460990010001047', 0033663000021,
+    41, '000102030405060708090A0B0C0D0E0F', 'oai-mme.oai.svc.cluster.local', 4, 'oai.svc.cluster.local',
+    '2683b376d1056746de3b254012908e0e', 96, '{\"Subscription-Data\":{\"Access-Restriction-Data\":41,\"Subscriber-Status\":0,\"Network-Access-Mode\":2,\"Regional-Subscription-Zone-Code\":[\"0x0123\",\"0x4567\",\"0x89AB\",\"0xCDEF\",\"0x1234\",\"0x5678\",\"0x9ABC\",\"0xDEF0\",\"0x2345\",\"0x6789\"],\"MSISDN\":\"0x0033663000021\",\"AMBR\":{\"Max-Requested-Bandwidth-UL\":50000000,\"Max-Requested-Bandwidth-DL\":100000000},\"APN-Configuration-Profile\":{\"Context-Identifier\":0,\"All-APN-Configurations-Included-Indicator\":0,\"APN-Configuration\":{\"Context-Identifier\":0,\"PDN-Type\":0,\"Served-Party-IP-Address\":[\"10.0.0.1\",\"10.0.0.2\"],\"Service-Selection\":\"apn.oai.svc.cluster.local\",\"EPS-Subscribed-QoS-Profile\":{\"QoS-Class-Identifier\":9,\"Allocation-Retention-Priority\":{\"Priority-Level\":15,\"Pre-emption-Capability\":0,\"Pre-emption-Vulnerability\":0}},\"AMBR\":{\"Max-Requested-Bandwidth-UL\":50000000,\"Max-Requested-Bandwidth-DL\":100000000},\"PDN-GW-Allocation-Type\":0,\"MIP6-Agent-Info\":{\"MIP-Home-Agent-Address\":[\"172.26.17.183\"]}}},\"Subscribed-Periodic-RAU-TAU-Timer\":0}}');\n"
+kind: ConfigMap
+metadata:
+  name: oai-db
+  namespace: oai
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: cassandra
+  name: cassandra
+  namespace: oai
+spec:
+  clusterIP: None
+  ports:
+  - port: 9042
+  selector:
+    app: cassandra
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: cassandra
+  namespace: oai
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cassandra
+  serviceName: cassandra
+  template:
+    metadata:
+      labels:
+        app: cassandra
+    spec:
+      nodeName: cloud-worker
+      containers:
+      - env:
+        - name: CASSANDRA_DC
+          valueFrom:
+            configMapKeyRef:
+              key: cassandra.dc
+              name: cassandra-config
+        - name: CASSANDRA_RACK
+          valueFrom:
+            configMapKeyRef:
+              key: cassandra.rack
+              name: cassandra-config
+        - name: CASSANDRA_CLUSTER_NAME
+          valueFrom:
+            configMapKeyRef:
+              key: cassandra.cluster_name
+              name: cassandra-config
+        - name: CASSANDRA_ENDPOINT_SNITCH
+          valueFrom:
+            configMapKeyRef:
+              key: cassandra.endpoint_snitch
+              name: cassandra-config
+        image: cassandra:3.11
+        name: cassandra
+        ports:
+        - containerPort: 7000
+          name: intra-node
+        - containerPort: 7001
+          name: tls-intra-node
+        - containerPort: 7199
+          name: jmx
+        - containerPort: 9042
+          name: cql 
+      securityContext:
+        runAsGroup: 0
+        runAsUser: 0
