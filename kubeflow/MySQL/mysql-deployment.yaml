@@ -17,8 +17,8 @@ spec:
     - hard
     - nfsvers=4.1
   nfs:
-    path: "/mnt/nfs"
-    server: "10.64.93.90" #ip of my master-node
+    path: "/mnt/nfs_server_files"
+    server: "10.64.94.81" #ip of my master-node
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -41,7 +41,6 @@ spec:
   - port: 3306
   selector:
     app: mysql
-  clusterIP: 10.96.0.2
 ---
 apiVersion: apps/v1
 kind: Deployment
