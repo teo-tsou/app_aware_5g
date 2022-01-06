@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+path="/root/app_aware/deployment"
+ 
+kubectl delete  -f "${path}oai-spgwu-devel.yaml"
+kubectl delete  -f "${path}oai-mme-devel.yaml"
+kubectl delete  -f "${path}oai-hss-devel.yaml"
+kubectl delete  -f "${path}cassandra.yaml"
+kubectl delete  -f "${path}oai-cu.yaml"
+kubectl delete  -f "${path}oai-du.yaml"
+kubectl delete  -f "${path}flexran-v2.1.1.yaml"
+kubectl delete  -f "${path}web-rtc.yaml"
+kubectl delete  -f "${path}sipp.yaml"
+kubectl delete  -f "${path}web-server.yaml"
+kubectl delete  -f "${path}mysql-deployment.yaml"

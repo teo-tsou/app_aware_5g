@@ -132,7 +132,7 @@ spec:
         command: ["/bin/sh", "-c"]
         args:
         - "/opt/oai-hss/bin/entrypoint.sh ; /usr/bin/sleep 2 ; /opt/oai-hss/bin/oai_hss -j /opt/oai-hss/etc/hss_rel14.json ;"
-        imagePullPolicy: Never
+        imagePullPolicy: IfNotPresent
         name: hss
         ports:
         - containerPort: 3868

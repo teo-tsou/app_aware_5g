@@ -23,6 +23,7 @@ spec:
             - mountPath: /lib/modules
               name: oai-cu-modules
           image: ttsourdinis/oai-build
+          imagePullPolicy: IfNotPresent
           securityContext:
             privileged: true
           command: ["/bin/bash", "-c"]

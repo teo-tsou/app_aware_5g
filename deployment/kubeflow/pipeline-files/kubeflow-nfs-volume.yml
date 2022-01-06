@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: kubeflow-pv
+  labels:
+    type: nfs
+spec:
+  capacity:
+    storage: 15Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Recycle
+  storageClassName: nfs
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: "/mnt/nfs_server_files"
+    server: "master" #or the ip of my master-node
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kubeflow-pvc
+  namespace: kubeflow
+spec:
+  storageClassName: nfs
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi

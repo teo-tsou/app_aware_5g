@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flexran
+  namespace: oai
+spec:
+  selector:
+    matchLabels:
+      run: flexran
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+        k8s.v1.cni.cncf.io/networks: flexran
+      labels:
+        app: flexran
+        run: flexran
+    spec:
+      containers:
+        - name: flexran
+          image: ttsourdinis/flexran-agent:v2.2.1
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            privileged: true
+          command: ["/bin/sh", "-c"]
+          args:
+          -  cd /projects/flexran-rtc/;
+             ./run_flexran_rtc.sh
+             while true;
+             do sleep 30;
+             done;
+              
+---
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: flexran
+  namespace: oai
+spec:
+  config: '{ "cniVersion": "0.3.0", "type": "macvlan", "master": "br0", "ipam": { "type": "static", "addresses": [ { "address": "192.168.18.202/24",
+    "gateway": "192.168.18.1" } ] } }'
+              

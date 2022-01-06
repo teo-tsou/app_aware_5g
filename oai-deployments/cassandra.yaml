@@ -161,6 +161,7 @@ spec:
               key: cassandra.endpoint_snitch
               name: cassandra-config
         image: cassandra:3.11
+        imagePullPolicy: IfNotPresent
         name: cassandra
         ports:
         - containerPort: 7000

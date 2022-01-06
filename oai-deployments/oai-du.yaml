@@ -25,6 +25,7 @@ spec:
             - mountPath: /lib/modules
               name: oai-du-modules
           image: ttsourdinis/oai-build
+          imagePullPolicy: IfNotPresent
           securityContext:
             privileged: true
           command: ["/bin/bash", "-c"]
