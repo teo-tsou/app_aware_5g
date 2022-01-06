@@ -132,10 +132,11 @@ spec:
 
       - command: ["/bin/sh", "-c"]
         args:
-        - while true;
+        - python3 /app_aware/parser/live_predictor_pp.py;
+          while true;
           do sleep 30;
           done;
-        image: ttsourdinis/oai-parser:latest
+        image: ttsourdinis/oai-parser
         securityContext:
           privileged: true
         name: predictor
@@ -143,6 +144,19 @@ spec:
         volumeMounts:
           - mountPath: "/mnt"
             name: apps-pvc
+      
+      - command: ["/bin/sh", "-c"]
+        args:
+        - python3 sniffer.py;
+          while true;
+          do sleep 30;
+          done;
+        image: ttsourdinis/oai-parser
+        securityContext:
+          privileged: true
+        name: sniffer
+        imagePullPolicy: IfNotPresent
+       
 
       dnsPolicy: ClusterFirst
       restartPolicy: Always

@@ -94,7 +94,7 @@ spec:
             configMapKeyRef:
               key: ue_dns_server
               name: spgwc-config
-        image: 194.177.207.79:5000/oai/oai-spgwc-devel
+        image: ttsourdinis/oai-spgwc
         command: ["/bin/sh", "-c"]
         args: 
         - "/opt/oai-spgwc/bin/entrypoint.sh ; /usr/bin/sleep 2; /opt/oai-spgwc/bin/spgwc -c /opt/oai-spgwc/etc/spgw_c.conf -o"
