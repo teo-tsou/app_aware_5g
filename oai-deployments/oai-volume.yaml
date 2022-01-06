@@ -18,7 +18,7 @@ spec:
     - nfsvers=4.1
   nfs:
     path: "/mnt/nfs_server_files"
-    server: "10.64.94.81" #ip of my master-node
+    server: "master" #or the ip of the master-node
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
