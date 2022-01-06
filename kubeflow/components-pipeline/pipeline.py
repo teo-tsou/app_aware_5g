@@ -3,14 +3,12 @@ from kfp import *
 import kfp.dsl as dsl
 
 
-@dsl.pipeline(name='First Pipeline', description='Simple Git Pipeline.')
+@dsl.pipeline(name='App-Aware Pipeline', description='AI Workflow')
 def first_pipeline():
 
-    # Loads the yaml manifest for each component
     step1 = kfp.components.load_component_from_file('/root/step1.yaml')
     step2 = kfp.components.load_component_from_file('/root/step2.yaml')
     
-    # Run download_data task and upload_data task
     comp1 = step1()
     comp2 = step2(comp1.output)
 
