@@ -63,8 +63,7 @@ e.g.:
  2) Init Cluster through scripts:
 
     ```
-    root@master:~# bash master_init.sh
-    root@master:~/app_aware/deployment/install_scripts bash master-init.sh
+    root@master:~# bash master-init.sh
 
     kubeadm join master:6443 --token 1iv0jy.04ngrum11g1jvrya --discovery-token-ca-cert-hash sha256:3651eeb28835fc1b94d8f626be8467024f80ed77cef5c89d4c78940f7d79bf8d 
 
@@ -124,6 +123,10 @@ After the installation, wait until all pods are running.
 
 
 ### Deploy AI Containerized 5G Network & Applications:
+
+On the antenna-worker Node:
+
+`root@antenna-worker:~# bash usrp_on.sh`
 
  On the Master Node:
 ```
