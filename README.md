@@ -111,15 +111,7 @@ e.g.:
 
     `root@master:~# bash deploy-storages.sh`
 
-6) Install Kubeflow:
-    
-    On the Master Node:
-```
-    root@master:~# cd app_aware/deployment/kubeflow/install
-    root@master:~/app_aware/deployment/kubeflow/install tar -xzvf kfctl_v1.0.2-0-ga476281_linux.tar.gz
-    root@master:~/app_aware/deployment/kubeflow/install ./kfctl apply -f kfctl_k8s_istio.v1.0.2.yaml
-```
-After the installation, wait until all pods are running.
+
 
 
 ### Deploy AI Containerized 5G Network & Applications:
@@ -212,13 +204,14 @@ Watch the logs on the Master Node:
 
 ### Employ Kubeflow Pipeline:
 
-First, destroy the 5G Deployment and the apps:
+
+1) First, destroy the 5G Deployment and the apps:
 
 `root@master:~/app_aware/deployment/ bash destroy-all.sh`
 
 On the Master Node:
 
-Create a database and a table inside MySQL Container: 
+2) Create a database and a table inside MySQL Container: 
 
 ```
 root@master:~# kubectl exec -ti mysql-63082529-2z3ki bash
@@ -233,6 +226,16 @@ Protocol varchar(12),
 Length_packet varchar(6)
 ```
 
+3) Install Kubeflow:
+    
+    On the Master Node:
+```
+    root@master:~# cd app_aware/deployment/kubeflow/install
+    root@master:~/app_aware/deployment/kubeflow/install tar -xzvf kfctl_v1.0.2-0-ga476281_linux.tar.gz
+    root@master:~/app_aware/deployment/kubeflow/install ./kfctl apply -V -f kfctl_k8s_istio.v1.0.2.yaml
+```
+After the installation, wait until all pods are running.
+
 
 Deploy the 5G Network and the Applications:
 
@@ -241,7 +244,7 @@ Deploy the 5G Network and the Applications:
 
 
 
-Deploy the pipeline volume:
+4) Deploy the pipeline volume:
 
 `root@master:~# cd app_aware/deployment/kubeflow/pipeline-files`
 `root@master:~/app_aware/deployment/kubeflow/pipeline-files kubectl create -f kubeflow-nfs-volume.yml`
@@ -524,13 +527,14 @@ Watch the logs on the Master Node:
 
 ### Employ Kubeflow Pipeline:
 
-First, destroy the 5G Deployment and the apps:
+
+1) First, destroy the 5G Deployment and the apps:
 
 `root@master:~/app_aware/deployment/ bash destroy-all.sh`
 
 On the Master Node:
 
-Create a database and a table inside MySQL Container: 
+2) Create a database and a table inside MySQL Container: 
 
 ```
 root@master:~# kubectl exec -ti mysql-63082529-2z3ki bash
@@ -545,6 +549,16 @@ Protocol varchar(12),
 Length_packet varchar(6)
 ```
 
+3) Install Kubeflow:
+    
+    On the Master Node:
+```
+    root@master:~# cd app_aware/deployment/kubeflow/install
+    root@master:~/app_aware/deployment/kubeflow/install tar -xzvf kfctl_v1.0.2-0-ga476281_linux.tar.gz
+    root@master:~/app_aware/deployment/kubeflow/install ./kfctl apply -V -f kfctl_k8s_istio.v1.0.2.yaml
+```
+After the installation, wait until all pods are running.
+
 
 Deploy the 5G Network and the Applications:
 
@@ -553,7 +567,7 @@ Deploy the 5G Network and the Applications:
 
 
 
-Deploy the pipeline volume:
+4) Deploy the pipeline volume:
 
 `root@master:~# cd app_aware/deployment/kubeflow/pipeline-files`
 `root@master:~/app_aware/deployment/kubeflow/pipeline-files kubectl create -f kubeflow-nfs-volume.yml`
