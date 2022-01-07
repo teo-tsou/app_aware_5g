@@ -2,6 +2,7 @@
 path="/root/app_aware/deployment/"
  
 kubectl delete  -f "${path}oai-spgwu-devel.yaml"
+kubectl delete  -f "${path}oai-spgwc-devel.yaml"
 kubectl delete  -f "${path}oai-mme-devel.yaml"
 kubectl delete  -f "${path}oai-hss-devel.yaml"
 kubectl delete  -f "${path}cassandra.yaml"
