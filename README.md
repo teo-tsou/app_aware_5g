@@ -123,7 +123,7 @@ On the antenna-worker Node:
  On the Master Node:
 ```
     root@master:~# cd app_aware/deployment/
-    root@master:~/app_aware/deployment/ bash deploy-all.sh
+    root@master:~/app_aware/deployment/ bash deploy-all
 
 ```
 Wait until all pods are running.
@@ -449,7 +449,7 @@ INTO vhss.users_imsi (imsi, msisdn, access_restriction, key, mmehost, mmeidentit
  On the Master Node:
 ```
     root@master:~# cd app_aware/deployment/
-    root@master:~/app_aware/deployment/ bash deploy-all.sh
+    root@master:~/app_aware/deployment/ bash deploy-all
 
 ```
 Wait until all pods are running.
