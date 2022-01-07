@@ -20,7 +20,7 @@
     root@host:~# sudo swapoff –a
 ```
 
-3) Assign Unique Hostname for Each Server Node (**Use the same hostnames**)
+3) Assign Unique Hostname for Each Server Node (**use the same hostnames**)
 
     For Master Node:
        `sudo hostnamectl set-hostname master`
@@ -207,7 +207,6 @@ Destination varchar(15),
 Protocol varchar(12),
 Length_packet varchar(6)
 ```
-
 
 
 Deploy the 5G Network and the Applications:
