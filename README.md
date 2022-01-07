@@ -530,7 +530,7 @@ Watch the logs on the Master Node:
 
 1) First, destroy the 5G Deployment and the apps:
 
-`root@master:~/app_aware/deployment/ bash destroy-all.sh`
+`root@master:~/app_aware/deployment/ bash destroy-all`
 
 On the Master Node:
 
