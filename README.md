@@ -1,4 +1,285 @@
-# app_aware
+
+# Installation Guide:
+
+## A) Install on Nitos Testbed (Highly Recommended)
+
+1) Create a User Account, Get a Slice & Reserve Nodes on the Testbed
+
+Check the documentation:
+   [ http://nitlab.inf.uth.gr/doc/accessing_nitos.html](url)
+
+2) Load the images on the nodes:
+
+Tested on Nodes: node055, node085, node086, node076, node065, node054
+
+node055: USRP B210 Node - Use it as a Kubernetes worker
+node085: Simple Node - Use it as a Kubernetes worker
+node086: Simple Node- Use it as Kubernetes Master Node
+
+node076, node065 & node054: HUAWEI LTE Dongles Nodes - Use them as UEs 
+
+For the Kubernetes Cluster **(use the specific nodes)**:
+`slicename@nitlab3:~$ omf load -i app-aware-node.ndz -t node055,node085,node086`
+
+For the UEs **(use the specific nodes)**:
+`slicename@nitlab3:~$ omf load -i app-aware-ue.ndz -t node076,node065,node054`
+
+After the load completes, access the nodes through ssh:
+e.g.: 
+`slicename@nitlab3:~$ ssh node086`
+
+
+### Cluster Installation:
+
+1) Assign Unique Hostname for Each Server Node (**use the same hostnames**)
+
+    For Master Node:
+       `root@node086:~# sudo hostnamectl set-hostname master`
+
+    For Worker:
+       `root@node085:~# sudo hostnamectl set-hostname cloud-worker`
+
+    Specifically for the USRP worker:
+       `root@node055:~# sudo hostnamectl set-hostname antenna-worker`
+
+    Add Host File Info
+    Now we will log in to **each machine** and edit the /etc/hosts configuration file using this command.
+
+    ```
+    root@host:~# tee -a /etc/hosts< 192.168.50.58 master
+    > 192.168.50.38 cloud-worker
+    > 192.168.50.178 antenna-worker
+    > EOF
+    ```
+
+    note: The IPs are random.
+
+ 2) Init Cluster through scripts:
+
+    ```
+    root@master:~# bash master_init.sh
+    root@master:~/app_aware/deployment/install_scripts bash master_init.sh
+
+    kubeadm join master:6443 --token 1iv0jy.04ngrum11g1jvrya --discovery-token-ca-cert-hash sha256:3651eeb28835fc1b94d8f626be8467024f80ed77cef5c89d4c78940f7d79bf8d 
+
+    ```
+
+3) Join Worker Nodes to Cluster:
+
+    `root@cloud-worker:~#  kubeadm join master:6443 --token 1iv0jy.04ngrum11g1jvrya --discovery-token-ca-cert-hash sha256:3651eeb28835fc1b94d8f626be8467024f80ed77cef5c89d4c78940f7d79bf8d `
+
+    `root@antenna-worker:~#  kubeadm join master:6443 --token 1iv0jy.04ngrum11g1jvrya --discovery-token-ca-cert-hash sha256:3651eeb28835fc1b94d8f626be8467024f80ed77cef5c89d4c78940f7d79bf8d `
+
+4) Install NFS to Cluster through scripts:
+
+    On the Master Node:
+
+    ```
+    root@master:~#  bash master-nfs.sh
+
+    ```
+    On the Worker Nodes:
+
+    ```
+    root@cloud-worker:~# bash workers-nfs.sh
+
+    ```
+
+    ```
+    root@antenna-worker:~# bash workers-nfs.sh
+
+    ```
+
+    Let’s ensure we can read/write to the shared directory. On one worker, touch a file:
+
+    `touch /mnt/nfs_client_files/ok.txt`
+
+    On another worker, look for the file:
+
+    `ls /mnt/nfs_client_files/ | grep ok.txt`
+
+    If the file exists, you’re good to go.
+
+5) Deploy Storages (Local-Host Provisioner, NFS Provisioner) & Multus CNI:
+
+    On the Master Node:
+
+    `root@master:~# bash deploy-storages.sh`
+
+6) Install Kubeflow:
+    
+    On the Master Node:
+```
+    root@master:~# cd app_aware/deployment/kubeflow/install
+    root@master:~/app_aware/deployment/kubeflow/install tar -xzvf kfctl_v1.0.2-0-ga476281_linux.tar.gz
+    root@master:~/app_aware/deployment/kubeflow/install ./kfctl apply -f kfctl_k8s_istio.v1.0.2.yaml
+```
+After the installation, wait until all pods are running.
+
+
+### Deploy AI Containerized 5G Network & Applications:
+
+ On the Master Node:
+```
+    root@master:~# cd app_aware/deployment/
+    root@master:~/app_aware/deployment/ bash deploy-all.sh
+
+```
+Wait until all pods are running.
+
+### UE Connectivity:
+
+1) Turn USB Dongles on **for each of UE**:
+
+e.g
+`root@node076:~# lte_dongle -o`
+
+2) Connect to the Network
+
+For each UE:
+
+   `root@node076:~# minicom -D /dev/ttyUSB1` 
+
+   `root@node065:~# minicom -D /dev/ttyUSB0` 
+
+   `root@node054:~# minicom -D /dev/ttyUSB1` 
+
+
+(For easy copy paste run on serial console: ^az -> t -> f -> change from 0 to 1 -> enter -> enter)
+
+Enter the following:
+```
+at+cgdcont=0,"IP","apn.oai.svc.cluster.local"
+at+cgdcont=1,"IP","apn.oai.svc.cluster.local"
+```
+
+Turn off the antenna until the 5G network is up:
+`at+cfun=0`
+
+
+When the CU/DU pods are running then:
+`at+cfun=1`
+
+Then enter:
+`at^ndisdup=1,1`
+
+Finally, enter:
+`at^dhcp?`
+
+If it returns IP in hex form, then exit minicom and:
+
+```
+ root@ue:~# dhclient wwan0
+ root@ue:~# ifconfig wwan0 netmask 255.255.255.0 -arp
+ root@ue:~# route add -net 192.168.3.0/24 gw 192.168.20.1
+```
+
+Then do the same for the next UE.
+
+
+### Create Traffic:
+
+On the UEs:
+
+```
+root@ue:~# cd app_aware/scenarios/scenario3/
+root@ue:~/app_aware/scenarios/scenario3/ bash ue1.sh
+```
+
+(for UE2: bash ue2.sh , for UE3: bash ue3.sh)
+
+### On-Demand Resource Provisioning:
+
+Watch the logs on the Master Node:
+    For App-Aware Predictor:
+   `root@master:~# kubectl logs -f oai-spgwu-86bfc8f9f7-2zrf2 -c predictor -n oai`
+    
+    For FlexRAN:
+   `root@master:~# kubectl logs -f flexran-588f7bc566-8kmjd -c predictor -n oai`
+
+
+
+### Employ Kubeflow Pipeline:
+
+First, destroy the 5G Deployment and the apps:
+
+`root@master:~/app_aware/deployment/ bash destroy-all.sh`
+
+On the Master Node:
+
+Create a database and a table inside MySQL Container: 
+
+```
+root@master:~# kubectl exec -ti mysql-63082529-2z3ki bash
+mysql-63082529-2z3ki@root:~#  mysql -h mysql -ppassword
+mysql> CREATE DATABASE oai;
+mysql> CREATE TABLE oai.app_data(
+Packet_Num varchar(6),
+Time_packet varchar(6),
+Source varchar(15),
+Destination varchar(15),
+Protocol varchar(12),
+Length_packet varchar(6)
+```
+
+
+Deploy the 5G Network and the Applications:
+
+`root@master:~/app_aware/deployment/ bash deploy-all.sh`
+
+
+
+
+Deploy the pipeline volume:
+
+`root@master:~# cd app_aware/deployment/kubeflow/pipeline-files`
+`root@master:~/app_aware/deployment/kubeflow/pipeline-files kubectl create -f kubeflow-nfs-volume.yml`
+
+Compile the pipeline script which will generate a yaml manifest (called app-aware-pipeline.yaml) the one will be uploaded to 
+Kubeflow Pipelines service in order to run the pipeline:
+
+`root@master:~/app_aware/deployment/kubeflow/pipeline-files python3 pipeline.py`
+
+Then upload the yaml file in master_ip:31380 kubeflow service
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## B) Install on a Different Testbed
+
+### Minimum Requirements:
+
+- 6 Nodes (3 Nodes for the cluster and 3 Nodes for the UEs):  Ubuntu bionic 18.04.2 LTS amd64/ Kernel 4.7.2 Low Latency | Cores=4 Mem=8G Root-disk=40G
+- 1 of the Cluster Nodes equipped with SDR USRP Device, preferably: ETTUS USRP B210 USB (anntena-worker)
+- All the UE nodes equipped with LTE Dongles 
+- SIM cards configuration :
+2. mcc = 460 
+3. mnc = 99 
+4. Ki: 000102030405060708090A0B0C0D0E0F 
+5. Opcode: (HSS) 00112233445566778899aabbccddeeff
+6. plmnid: 46099
+
+
+
+
 
 ### Cluster Installation:
 
@@ -23,13 +304,13 @@
 3) Assign Unique Hostname for Each Server Node (**use the same hostnames**)
 
     For Master Node:
-       `sudo hostnamectl set-hostname master`
+       `root@host:~# sudo hostnamectl set-hostname master`
 
     For Worker:
-       `sudo hostnamectl set-hostname cloud-worker`
+       `root@host:~# sudo hostnamectl set-hostname cloud-worker`
 
     Specifically for the USRP worker:
-       `sudo hostnamectl set-hostname antenna-worker`
+       `root@host:~# sudo hostnamectl set-hostname antenna-worker`
 
     Add Host File Info
     Now we will log in to **each machine** and edit the /etc/hosts configuration file using this command.
@@ -109,6 +390,31 @@ After the installation, wait until all pods are running.
 
 
 ### Deploy AI Containerized 5G Network & Applications:
+
+**It is highly recommended** before the deployment, to download the images **on both of the Worker Nodes**:
+
+```
+REPOSITORY                        TAG   
+ttsourdinis/oai-parser          latest
+MySQL                                  5.6   
+ttsourdinis/oai-spgwc          latest
+cassandra                             3.11  
+ttsourdinis/flexran-agent     v2.2.1
+ttsourdinis/oai-build            latest
+ttsourdinis/webrtc                latest
+ttsourdinis/oai-spgwu          latest
+ttsourdinis/oai-hss               latest
+ttsourdinis/oai-mme            latest
+ttsourdinis/web-server         latest
+ttsourdinis/sipp                    latest
+
+```
+For example: 
+`root@cloud-worker:~# docker pull ttsourdinis/oai-parser`
+
+`root@antenna-worker:~# docker pull ttsourdinis/flexran-agent:v2.2.1`
+
+
 
  On the Master Node:
 ```
@@ -191,6 +497,10 @@ Watch the logs on the Master Node:
 
 ### Employ Kubeflow Pipeline:
 
+First, destroy the 5G Deployment and the apps:
+
+`root@master:~/app_aware/deployment/ bash destroy-all.sh`
+
 On the Master Node:
 
 Create a database and a table inside MySQL Container: 
@@ -225,3 +535,6 @@ Compile the pipeline script which will generate a yaml manifest (called app-awar
 Kubeflow Pipelines service in order to run the pipeline:
 
 `root@master:~/app_aware/deployment/kubeflow/pipeline-files python3 pipeline.py`
+
+Then upload the yaml file in master_ip:31380 kubeflow service
+
