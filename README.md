@@ -4,17 +4,21 @@
 
 1) Install Docker for Each Server Node:
 
-    `root@host:~# sudo apt-get install docker.io`
-    `root@host:~# sudo systemctl enable docker`
-    `root@host:~# sudo systemctl start docker`
+```
+    root@host:~# sudo apt-get install docker.io
+    root@host:~# sudo systemctl enable docker
+    root@host:~# sudo systemctl start docker
+```
 
 2) Install Kubernetes (v1.21.0) for Each Server Node:
 
-    `root@host:~# curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add`
-    `root@host:~# sudo apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"`
-    `root@host:~# sudo apt install kubeadm=1.21.0-00 kubectl=1.21.0-00 kubelet=1.21.0-00`
-    `root@host:~# sudo apt-mark hold kubeadm kubelet kubectl`
-    `root@host:~# sudo swapoff –a`
+```
+    root@host:~# curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add
+    root@host:~# sudo apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
+    root@host:~# sudo apt install kubeadm=1.21.0-00 kubectl=1.21.0-00 kubelet=1.21.0-00
+    root@host:~# sudo apt-mark hold kubeadm kubelet kubectl
+    root@host:~# sudo swapoff –a
+```
 
 3) Assign Unique Hostname for Each Server Node (**Use the same hostnames**)
 
@@ -178,9 +182,10 @@ root@ue:~/app_aware/scenarios/scenario3/ bash ue1.sh
 ### On-Demand Resource Provisioning:
 
 Watch the logs on the Master Node:
-
+    For App-Aware Predictor:
    `root@master:~# kubectl logs -f oai-spgwu-86bfc8f9f7-2zrf2 -c predictor -n oai`
-
+    
+    For FlexRAN:
    `root@master:~# kubectl logs -f flexran-588f7bc566-8kmjd -c predictor -n oai`
                     
 
