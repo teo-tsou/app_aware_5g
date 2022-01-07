@@ -402,19 +402,19 @@ After the installation, wait until all pods are running.
 **It is highly recommended** before the deployment, to download the images **on both of the Worker Nodes**:
 
 ```
-REPOSITORY                        TAG   
-ttsourdinis/oai-parser          latest
-MySQL                                  5.6   
+REPOSITORY                     TAG   
+ttsourdinis/oai-parser         latest
+MySQL                          5.6   
 ttsourdinis/oai-spgwc          latest
-cassandra                             3.11  
+cassandra                      3.11  
 ttsourdinis/flexran-agent     v2.2.1
-ttsourdinis/oai-build            latest
-ttsourdinis/webrtc                latest
-ttsourdinis/oai-spgwu          latest
-ttsourdinis/oai-hss               latest
-ttsourdinis/oai-mme            latest
-ttsourdinis/web-server         latest
-ttsourdinis/sipp                    latest
+ttsourdinis/oai-build         latest
+ttsourdinis/webrtc            latest
+ttsourdinis/oai-spgwu         latest
+ttsourdinis/oai-hss           latest
+ttsourdinis/oai-mme           latest
+ttsourdinis/web-server        latest
+ttsourdinis/sipp              latest
 
 ```
 For example: 
