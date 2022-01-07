@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-path="/root/app_aware/deployment"
+path="/root/app_aware/deployment/"
  
 kubectl delete  -f "${path}oai-spgwu-devel.yaml"
 kubectl delete  -f "${path}oai-mme-devel.yaml"
