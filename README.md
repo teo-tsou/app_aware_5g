@@ -399,7 +399,7 @@ After the installation, wait until all pods are running.
 
 ### Deploy AI Containerized 5G Network & Applications:
 
-**It is highly recommended** before the deployment, to download the images **on both of the Worker Nodes**:
+1) **It is highly recommended** before the deployment, to download the images **on both of the Worker Nodes**:
 
 ```
 REPOSITORY                     TAG   
@@ -417,12 +417,28 @@ ttsourdinis/web-server        latest
 ttsourdinis/sipp              latest
 
 ```
+
+
 For example: 
 `root@cloud-worker:~# docker pull ttsourdinis/oai-parser`
 
 `root@antenna-worker:~# docker pull ttsourdinis/flexran-agent:v2.2.1`
 
 
+
+2) Edit the cassandra.yaml file to add the subscriber 3 UEs:
+
+On the config_map section, for example:
+
+```
+INTO vhss.users_imsi (imsi, msisdn, access_restriction, key, mmehost, mmeidentity_idmmeidentity,
+    mmerealm, rand, sqn, subscription_data) VALUES ('460990010001045', 0033663000021,
+    41, '000102030405060708090A0B0C0D0E0F', 'oai-mme.oai.svc.cluster.local', 4, 'oai.svc.cluster.local',
+    '2683b376d1056746de3b254012908e0e', 96, '{\"Subscription-Data\":{\"Access-Restriction-Data\":41,\"Subscriber-Status\":0,\"Network-Access-Mode\":2,\"Regional-Subscription-Zone-Code\":[\"0x0123\",\"0x4567\",\"0x89AB\",\"0xCDEF\",\"0x1234\",\"0x5678\",\"0x9ABC\",\"0xDEF0\",\"0x2345\",\"0x6789\"],\"MSISDN\":\"0x0033663000021\",\"AMBR\":{\"Max-Requested-Bandwidth-UL\":50000000,\"Max-Requested-Bandwidth-DL\":100000000},\"APN-Configuration-Profile\":{\"Context-Identifier\":0,\"All-APN-Configurations-Included-Indicator\":0,\"APN-Configuration\":{\"Context-Identifier\":0,\"PDN-Type\":0,\"Served-Party-IP-Address\":[\"10.0.0.1\",\"10.0.0.2\"],\"Service-Selection\":\"apn.oai.svc.cluster.local\",\"EPS-Subscribed-QoS-Profile\":{\"QoS-Class-Identifier\":9,\"Allocation-Retention-Priority\":{\"Priority-Level\":15,\"Pre-emption-Capability\":0,\"Pre-emption-Vulnerability\":0}},\"AMBR\":{\"Max-Requested-Bandwidth-UL\":50000000,\"Max-Requested-Bandwidth-DL\":100000000},\"PDN-GW-Allocation-Type\":0,\"MIP6-Agent-Info\":{\"MIP-Home-Agent-Address\":[\"172.26.17.183\"]}}},\"Subscribed-Periodic-RAU-TAU-Timer\":0}}');\nINSERT
+
+```    
+
+3) Deploy:
 
  On the Master Node:
 ```
