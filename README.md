@@ -38,15 +38,15 @@ e.g.:
 
     For Master Node:
     
-       `root@node086:~# sudo hostnamectl set-hostname master`
+    `root@node086:~# sudo hostnamectl set-hostname master`
 
     For Worker:
     
-       `root@node085:~# sudo hostnamectl set-hostname cloud-worker`
+    `root@node085:~# sudo hostnamectl set-hostname cloud-worker`
 
     Specifically for the USRP worker:
     
-       `root@node055:~# sudo hostnamectl set-hostname antenna-worker`
+    `root@node055:~# sudo hostnamectl set-hostname antenna-worker`
 
     Add Host File Info
     Now we will log in to **each machine** and edit the /etc/hosts configuration file using this command.
