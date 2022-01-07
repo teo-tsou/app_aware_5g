@@ -19,13 +19,16 @@ node086: Simple Node- Use it as Kubernetes Master Node
 node076, node065 & node054: HUAWEI LTE Dongles Nodes - Use them as UEs 
 
 For the Kubernetes Cluster **(use the specific nodes)**:
+
 `slicename@nitlab3:~$ omf load -i app-aware-node.ndz -t node055,node085,node086`
 
 For the UEs **(use the specific nodes)**:
+
 `slicename@nitlab3:~$ omf load -i app-aware-ue.ndz -t node076,node065,node054`
 
 After the load completes, access the nodes through ssh:
 e.g.: 
+
 `slicename@nitlab3:~$ ssh node086`
 
 
@@ -34,12 +37,15 @@ e.g.:
 1) Assign Unique Hostname for Each Server Node (**use the same hostnames**)
 
     For Master Node:
+    
        `root@node086:~# sudo hostnamectl set-hostname master`
 
     For Worker:
+    
        `root@node085:~# sudo hostnamectl set-hostname cloud-worker`
 
     Specifically for the USRP worker:
+    
        `root@node055:~# sudo hostnamectl set-hostname antenna-worker`
 
     Add Host File Info
@@ -192,9 +198,11 @@ root@ue:~/app_aware/scenarios/scenario3/ bash ue1.sh
 
 Watch the logs on the Master Node:
     For App-Aware Predictor:
+    
    `root@master:~# kubectl logs -f oai-spgwu-86bfc8f9f7-2zrf2 -c predictor -n oai`
     
     For FlexRAN:
+    
    `root@master:~# kubectl logs -f flexran-588f7bc566-8kmjd -c predictor -n oai`
 
 
