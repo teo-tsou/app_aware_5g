@@ -197,11 +197,11 @@ root@ue:~/app_aware/scenarios/scenario3/ bash ue1.sh
 ### On-Demand Resource Provisioning:
 
 Watch the logs on the Master Node:
-    For App-Aware Predictor:
+   For App-Aware Predictor:
     
    `root@master:~# kubectl logs -f oai-spgwu-86bfc8f9f7-2zrf2 -c predictor -n oai`
     
-    For FlexRAN:
+   For FlexRAN:
     
    `root@master:~# kubectl logs -f flexran-588f7bc566-8kmjd -c predictor -n oai`
 
@@ -496,10 +496,10 @@ root@ue:~/app_aware/scenarios/scenario3/ bash ue1.sh
 ### On-Demand Resource Provisioning:
 
 Watch the logs on the Master Node:
-    For App-Aware Predictor:
+   For App-Aware Predictor:
    `root@master:~# kubectl logs -f oai-spgwu-86bfc8f9f7-2zrf2 -c predictor -n oai`
     
-    For FlexRAN:
+   For FlexRAN:
    `root@master:~# kubectl logs -f flexran-588f7bc566-8kmjd -c predictor -n oai`
                     
 
