@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-path="/root/app_aware/deployment"
+path="/root/app_aware/deployment/"
 
 #echo {\n "insecure-registries" : ["194.177.207.79:5000"]\n} > /etc/docker/daemon.json
-kubectl create secret docker-registry  regcred --docker-server=194.177.207.79:5000 --docker-username=admin --docker-password=password
+#kubectl create secret docker-registry  regcred --docker-server=194.177.207.79:5000 --docker-username=admin --docker-password=password
 kubectl create namespace oai
 kubectl create -f "${path}oai-volume.yaml"
 
