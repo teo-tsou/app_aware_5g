@@ -271,11 +271,11 @@ Then upload the yaml file in master_ip:31380 kubeflow service
 - 1 of the Cluster Nodes equipped with SDR USRP Device, preferably: ETTUS USRP B210 USB (anntena-worker)
 - All the UE nodes equipped with LTE Dongles 
 - SIM cards configuration :
-2. mcc = 460 
-3. mnc = 99 
-4. Ki: 000102030405060708090A0B0C0D0E0F 
-5. Opcode: (HSS) 00112233445566778899aabbccddeeff
-6. plmnid: 46099
+1. mcc = 460 
+2. mnc = 99 
+3. Ki: 000102030405060708090A0B0C0D0E0F 
+4. Opcode: (HSS) 00112233445566778899aabbccddeeff
+5. plmnid: 46099
 
 
 
