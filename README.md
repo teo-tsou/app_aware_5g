@@ -6,7 +6,7 @@
 1) Create a User Account, Get a Slice & Reserve Nodes on the Testbed
 
 Check the documentation:
-   [ http://nitlab.inf.uth.gr/doc/accessing_nitos.html](url)
+   [http://nitlab.inf.uth.gr/doc/accessing_nitos.html](url)
 
 2) Load the images on the nodes:
 
