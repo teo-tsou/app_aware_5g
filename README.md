@@ -24,7 +24,7 @@ node076, node065 & node054: HUAWEI LTE Dongles Nodes - Use them as UEs
 
 For the Kubernetes Cluster (use the specific nodes):
 ```
-ssh slicename@nitlab3.inf.uth.gr
+root@host:~# ssh -X slicename@nitlab3.inf.uth.gr
 slicename@nitlab3:~$ omf load -i app-aware-node.ndz -t node055,node085,node086
 ```
 
