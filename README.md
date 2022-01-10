@@ -1,7 +1,8 @@
+# AI-driven Application-Aware 5G Network on Kubernetes:
 
-# Installation Guide:
+## Installation Guide:
 
-## A) Install on Nitos Testbed (Highly Recommended)
+### A) Install on Nitos Testbed (Highly Recommended)
 
 1) Create a User Account, Get a Slice & Reserve Nodes on the Testbed
 
@@ -33,7 +34,7 @@ e.g.:
 `slicename@nitlab3:~$ ssh node086`
 
 
-### Cluster Installation:
+#### Cluster Installation:
 
 1) Assign Unique Hostname for Each Server Node (**use the same hostnames**)
 
@@ -115,7 +116,7 @@ e.g.:
 
 
 
-### Deploy AI Containerized 5G Network & Applications:
+#### Deploy AI Containerized 5G Network & Applications:
 
 On the antenna-worker Node:
 
@@ -129,7 +130,7 @@ On the antenna-worker Node:
 ```
 Wait until all pods are running.
 
-### UE Connectivity:
+#### UE Connectivity:
 
 1) Turn USB Dongles on **for each of UE**:
 
@@ -177,7 +178,7 @@ If it returns IP in hex form, then exit minicom and:
 Then do the same for the next UE.
 
 
-### Create Traffic:
+#### Create Traffic:
 
 On the UEs:
 
@@ -188,7 +189,7 @@ root@ue:~/app_aware/scenarios/scenario3/ bash ue1.sh
 
 (for UE2: bash ue2.sh , for UE3: bash ue3.sh)
 
-### On-Demand Resource Provisioning:
+#### On-Demand Resource Provisioning:
 
 Watch the logs on the Master Node:
    For App-Aware Predictor:
@@ -201,7 +202,7 @@ Watch the logs on the Master Node:
 
 
 
-### Employ Kubeflow Pipeline:
+#### Employ Kubeflow Pipeline:
 
 
 1) First, destroy the 5G Deployment and the apps:
@@ -276,9 +277,9 @@ Then upload the yaml file in master_ip:31380 kubeflow service
 
 
 
-## B) Install on a Different Testbed
+### B) Install on a Different Testbed
 
-### Minimum Requirements:
+#### Minimum Requirements:
 
 - 6 Nodes (3 Nodes for the cluster and 3 Nodes for the UEs):  Ubuntu bionic 18.04.2 LTS amd64/ Kernel 4.7.2 Low Latency | Cores=4 Mem=8G Root-disk=40G
 - 1 of the Cluster Nodes equipped with SDR USRP Device, preferably: ETTUS USRP B210 USB (anntena-worker)
@@ -294,7 +295,7 @@ Then upload the yaml file in master_ip:31380 kubeflow service
 
 
 
-### Cluster Installation:
+#### Cluster Installation:
 
 1) Install Docker for Each Server Node:
 
@@ -402,7 +403,7 @@ Then upload the yaml file in master_ip:31380 kubeflow service
 After the installation, wait until all pods are running.
 
 
-### Deploy AI Containerized 5G Network & Applications:
+#### Deploy AI Containerized 5G Network & Applications:
 
 1) **It is highly recommended** before the deployment, to download the images **on both of the Worker Nodes**:
 
@@ -454,7 +455,7 @@ INTO vhss.users_imsi (imsi, msisdn, access_restriction, key, mmehost, mmeidentit
 Wait until all pods are running.
 
 
-### UE Applications Install & Network Connectivity:
+#### UE Applications Install & Network Connectivity:
 
 1) Install Applications for Each UE:
 
@@ -503,7 +504,7 @@ If it returns IP in hex form, then exit minicom and:
  root@ue:~# route add -net 192.168.3.0/24 gw 192.168.20.1
 ```
 
-### Create Traffic:
+#### Create Traffic:
 
 On the UEs:
 
@@ -514,7 +515,7 @@ root@ue:~/app_aware/scenarios/scenario3/ bash ue1.sh
 
 (for UE2: bash ue2.sh , for UE3: bash ue3.sh)
 
-### On-Demand Resource Provisioning:
+#### On-Demand Resource Provisioning:
 
 Watch the logs on the Master Node:
    For App-Aware Predictor:
@@ -524,7 +525,7 @@ Watch the logs on the Master Node:
    `root@master:~# kubectl logs -f flexran-588f7bc566-8kmjd -c predictor -n oai`
                     
 
-### Employ Kubeflow Pipeline:
+#### Employ Kubeflow Pipeline:
 
 
 1) First, destroy the 5G Deployment and the apps:
