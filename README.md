@@ -1,5 +1,7 @@
 # AI-driven Application-Aware 5G Network on Kubernetes:
 
+A cloud-native 5G Network based on OAI platform, fully deployed on Kubernetes, enhanced with AI Unit to forecast the interactions between end-users and applications, and to improve the Quality of Experience of the users with the help of the FlexRAN.
+
 ## Installation Guide:
 
 ### A) Install on Nitos Testbed (Highly Recommended)
