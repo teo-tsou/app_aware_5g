@@ -171,9 +171,7 @@ Finally, enter:
 If it returns IP in hex form, then exit minicom and:
 
 ```
- root@ue:~# dhclient wwan0
- root@ue:~# ifconfig wwan0 netmask 255.255.255.0 -arp
- root@ue:~# route add -net 192.168.3.0/24 gw 192.168.20.1
+ root@ue:~# bash attach-ip.sh
 ```
 
 Then do the same for the next UE.
