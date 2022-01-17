@@ -316,7 +316,7 @@ Then upload the yaml file in master_ip:31380 kubeflow service
     root@host:~# sudo apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
     root@host:~# sudo apt install kubeadm=1.21.0-00 kubectl=1.21.0-00 kubelet=1.21.0-00
     root@host:~# sudo apt-mark hold kubeadm kubelet kubectl
-    root@host:~# sudo swapoff –a
+    root@host:~# sudo swapoff -a
 ```
 
 3) Assign Unique Hostname for Each Server Node (**use the same hostnames**)
