@@ -14,10 +14,10 @@ http://nitlab.inf.uth.gr/doc/accessing_nitos.html
 
 2) Load the images on the nodes:
 
-Tested on Nodes: node055, node085, node086, node076, node065, node054
+Tested on Nodes: node055, node084, node085, node076, node065, node054
 
 node055: USRP B210 Node - Use it as a Kubernetes worker
-node085: Simple Node - Use it as a Kubernetes worker
+node084: Simple Node - Use it as a Kubernetes worker
 node086: Simple Node- Use it as Kubernetes Master Node
 
 node076, node065 & node054: HUAWEI LTE Dongles Nodes - Use them as UEs 
@@ -25,7 +25,7 @@ node076, node065 & node054: HUAWEI LTE Dongles Nodes - Use them as UEs
 For the Kubernetes Cluster (use the specific nodes):
 ```
 root@host:~# ssh -X slicename@nitlab3.inf.uth.gr
-slicename@nitlab3:~$ omf load -i app-aware-node.ndz -t node055,node085,node086
+slicename@nitlab3:~$ omf load -i app-aware-node.ndz -t node055,node084,node085
 ```
 
 For the UEs (use the specific nodes):
