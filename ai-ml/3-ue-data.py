@@ -55,6 +55,7 @@ def packet_parser(mini_window_duration=1, max_mws=30, mode=0, verbose=0, debug=0
     mw_dict['UE3-CQI'] = []
 
 
+
     # data structure to keep mws for predicitons
     X_mws = []
 
@@ -88,6 +89,9 @@ def packet_parser(mini_window_duration=1, max_mws=30, mode=0, verbose=0, debug=0
     ue1_cqi = 0
     ue2_cqi = 0
     ue3_cqi = 0
+    ue1_length = []
+    ue2_length = []
+    ue3_length = []
 
     for packet in capture.sniff_continuously():
         counter=1
@@ -113,12 +117,15 @@ def packet_parser(mini_window_duration=1, max_mws=30, mode=0, verbose=0, debug=0
         if packet.source == '192.168.20.2' or packet.destination == '192.168.20.2' :
             ue = 'UE1'
             ue1_time.append(packet.time)
+            ue1_length.append(eval(packet.length))
         if packet.source == '192.168.20.3' or packet.destination == '192.168.20.3' :
             ue = 'UE2'
             ue2_time.append(packet.time)
+            ue2_length.append(eval(packet.length))
         if packet.source == '192.168.20.4' or packet.destination == '192.168.20.4' :
             ue = 'UE3'
             ue3_time.append(packet.time)
+            ue3_length.append(eval(packet.length))
 
 
         
@@ -139,35 +146,54 @@ def packet_parser(mini_window_duration=1, max_mws=30, mode=0, verbose=0, debug=0
             
             #Calculate Jitter in mini window duration for each UE:
             
-                #UE1:
+               #UE1:
+            if sum(ue1_length) != 0:
+                for t in range(len(ue1_time) -1):
+                    jitter_ue1 = eval(ue1_time[t+1]) - eval(ue1_time[t])
+                    ue1_jitter.append(jitter_ue1)
+                    ue1_jitter_mw_avg = mean(ue1_jitter)
+                    #print(f'MEAN JITTER APO UE1: {ue1_jitter_mw_avg}')
+                jitter_ue1 = []
+                ue1_time = []
+                ue1_length = []
 
-            for t in range(len(ue1_time) -1):
-                jitter_ue1 = eval(ue1_time[t+1]) - eval(ue1_time[t])
-                ue1_jitter.append(jitter_ue1)
-                ue1_jitter_mw_avg = mean(ue1_jitter)
-                #print(f'MEAN JITTER APO UE1: {ue1_jitter_mw_avg}')
-            jitter_ue1 = []
-            ue1_time = []
+            else: 
+                ue1_jitter_mw_avg = 'None'
+                jitter_ue1 = []
+                ue1_time = []
+                ue1_length = []
             
                 #UE2:
-            
-            for t in range(len(ue2_time) -1):
-                jitter_ue2 = eval(ue2_time[t+1]) - eval(ue2_time[t])
-                ue2_jitter.append(jitter_ue2)
-                ue2_jitter_mw_avg = mean(ue2_jitter)
-                #print(f'MEAN JITTER APO UE2: {ue2_jitter_mw_avg}')
-            jitter_ue2 = []
-            ue2_time = []
-            
+            if sum(ue2_length) != 0:
+                for t in range(len(ue2_time) -1):
+                    jitter_ue2 = eval(ue2_time[t+1]) - eval(ue2_time[t])
+                    ue2_jitter.append(jitter_ue2)
+                    ue2_jitter_mw_avg = mean(ue2_jitter)
+                    #print(f'MEAN JITTER APO UE2: {ue2_jitter_mw_avg}')
+                jitter_ue2 = []
+                ue2_time = []
+                ue2_length = []
+            else: 
+                ue2_jitter_mw_avg = 'None'
+                jitter_ue2 = []
+                ue2_time = []
+                ue2_length = []
+
+
                 #UE3:
-               
-            for t in range(len(ue3_time) -1):
-                jitter_ue3 = eval(ue3_time[t+1]) - eval(ue3_time[t])
-                ue3_jitter.append(jitter_ue3)
-                ue3_jitter_mw_avg = mean(ue3_jitter)
-                #print(f'MEAN JITTER APO UE3: {ue3_jitter_mw_avg}')
-            jitter_ue3 = []
-            ue3_time = []    
+            if sum(ue3_length) != 0:
+                for t in range(len(ue3_time) -1):
+                    jitter_ue3 = eval(ue3_time[t+1]) - eval(ue3_time[t])
+                    ue3_jitter.append(jitter_ue3)
+                    ue3_jitter_mw_avg = mean(ue3_jitter)
+                jitter_ue3 = []
+                ue3_time = []
+                ue3_length = []
+            else: 
+                ue3_jitter_mw_avg = 'None'
+                jitter_ue3 = []
+                ue3_time = []
+                ue3_length = []
             
             
             # Monitoring - Collecting CQI
@@ -535,7 +561,122 @@ def json_extract(obj, key):
     values = extract(obj, arr, key)
     return values
 
+def rnti_parser(ues = 3):
+    URL = "http://192.168.18.202:9999/stats/"
+    rnti = []
+    all_ues = 0
+    while(1):
+        if all_ues == 1:
+            break
+        r = requests.get(url = URL)
+        data = r.json()
+        if data['eNB_config']:
+            for enb in data['eNB_config']:
+                if enb['UE']:
+                    for ue in enb['UE']['ueConfig']:
+                        rnti.append(ue['rnti'])
+                    if len(rnti) != ues:
+                        rnti = []
+                    else:
+                        all_ues = 1
+                else:
+                    break
+    return(rnti)             
+
+def post_configure(slice0, slice1, slice2, debug=0):
+    # defining the api-endpoint  
+    API_ENDPOINT = "http://192.168.18.202:9999/slice/enb/-1"
+
+    data = {
+        "ul": [
+            {
+                "id": 0,
+                "percentage":16,
+                "maxmcs": 16
+            },
+            {
+                "id": 1,
+                "percentage":17,
+                "maxmcs": 16
+            },
+            {
+                "id": 2,
+                "percentage":16,
+                "maxmcs": 16
+            }
+        ],
+        "dl": [
+            {
+                "id": 0,
+                "percentage":slice0,
+                "maxmcs": 26
+            },
+            {
+                "id": 1,
+                "percentage":slice1,
+                "maxmcs": 26
+            },
+            {
+                "id": 2,
+                "percentage":slice2,
+                "maxmcs": 26
+            }
+        ],
+        "intrasliceShareActive": True,
+        "intersliceShareActive": True
+    }
+
+    # sending post request and saving response as response object 
+    if debug ==0:
+        r = requests.post(url = API_ENDPOINT, json = data) 
+
+
+def post_assoc(rnti):
+
+    API_ENDPOINT = "http://192.168.18.202:9999/ue_slice_assoc/enb/-1"
+    
+    if len(rnti) == 3:
+        assoc1 = {
+            "ueConfig": [
+                {
+                    "rnti": rnti[0],
+                    "dlSliceId": 0
+                }
+            ]
+        }
+        r = requests.post(url = API_ENDPOINT, json = assoc1)
+        time.sleep(2)
+        assoc2 = {
+            "ueConfig": [
+                {
+                    "rnti": rnti[1],
+                    "dlSliceId": 1
+                }
+            ]
+        }
+        r = requests.post(url = API_ENDPOINT, json = assoc2)
+        time.sleep(2)
+        assoc3 = {
+            "ueConfig": [
+                {
+                    "rnti": rnti[2],
+                    "dlSliceId": 2
+                }
+            ]
+        }
+
+        r = requests.post(url = API_ENDPOINT, json = assoc3) 
+
+
+def init_slice(ues=3,slice0=8,slice1=8,slice2=8):
+    rnti = rnti_parser(ues)
+    time.sleep(3.5)
+    post_configure(slice0,slice1,slice2)
+    time.sleep(0.5)
+    post_assoc(rnti)    
+
 if __name__ == "__main__":
+    init_slice(ues = 3, slice0=8, slice1=8, slice2=8)
     packet_parser(mini_window_duration=1, max_mws=30, mode=0,verbose=0, debug=1)
 
 
