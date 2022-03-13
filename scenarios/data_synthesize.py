@@ -53,7 +53,12 @@ for synth in range(num_synth):
             # apply this percentage to the item, get some proportion of the mean value of the column as a noise
             # this is done in order the noise to be equally distributed
             if item != 0:
-                noised_item = round(item + noise_percentage*col_mean)
+
+                # Jitters must not be rounded
+                if j in [9,10,11]:
+                    noised_item = item + noise_percentage*col_mean
+                else:
+                    noised_item = round(item + noise_percentage*col_mean)
             else:
                 noised_item = 0
 
