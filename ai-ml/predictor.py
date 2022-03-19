@@ -291,7 +291,7 @@ def packet_parser(mini_window_duration=1, max_mws=30, mode=0, verbose=0, debug=0
                         X_scaled = scale_x(X_list)
                         
                         # predict
-                        #yhat = predict(X_list,max_mws)
+                        yhat = predict(X_scaled)
 
                         #post slice
                         #post_slice(yhat, debug=debug)
@@ -324,7 +324,7 @@ def packet_parser(mini_window_duration=1, max_mws=30, mode=0, verbose=0, debug=0
                     X_scaled = scale_x(X_list)
                     
                     # predict
-                    #yhat = predict(X_list,max_mws)
+                    yhat = predict(X_scaled)
 
                     # post slice
                     #post_slice(yhat, debug=debug)
@@ -392,7 +392,7 @@ def packet_parser(mini_window_duration=1, max_mws=30, mode=0, verbose=0, debug=0
                 X_scaled = scale_x(X_list)
                 #print(X_list)
                 # predict
-                #yhat = predict(X_list,max_mws)
+                yhat = predict(X_scaled)
 
                 # post slice
                 #post_slice(yhat,debug=debug)
@@ -561,105 +561,271 @@ def scale_x(X_list,verbose=2):
 
     #return X_scaled
 
+def predict(X_scaled,verbose=2):
+    # load model
+    model = load_model('../models/CNN-LSTM/app_aware_CNN-LSTM_15cols.best.hdf5')
+
+    yhat = model.predict(X_scaled)
+
+    if verbose == 2:
+        print('\n\n')
+        print('           ______________________________         ')
+        print('|#########|                              |#########|')
+        print('|~~~~~~~~~|   Service-aware AI/ML Unit   |~~~~~~~~~|')
+        print('|#########|______________________________|#########|')
+        print()
+        print("|#####~~~~~~~~~~~  Input Window  ~~~~~~~~~~~~~#####|")
+        print(str(X_scaled))
+        #print("yhat:"+str(yhat)+"\n\n")
+
+    return yhat
+
+def filter_thresholds(web_rtc, sipp, web_server, jitter, cqi):
+    # thresholds: 
+    # 1) app: 
+    #           0 (web_server), 
+    #           1 (sipp), 
+    #           2 (web_rtc)
+    #
+    # 2) length (l): 
+    #           0 (l < 25000), 
+    #           1     (25000 < l < 50000), 
+    #           2                 (50000 < l)
+    #
+    # 3) jitter (j): 
+    #           0 (j < 5), 
+    #           1     (5 < j < 10), 
+    #           2             (10 < j)
+    #
+    # 4) cqi (c): 
+    #           0             (11 < c), 
+    #           1     (9 < c < 11), 
+    #           2 (c < 9)
+
+    # 1) app
+    if web_rtc > 0:
+        app = 2
+    elif sipp > 0:
+        app = 1
+    else:
+        app = 0
+
+    # 2) length
+    total_sum = web_rtc + sipp + web_server
+    if total_sum > 50000:
+        length = 2
+    elif total_sum <= 50000 and total_sum > 25000:
+        length = 1
+    else:
+        length = 0
+
+    # 3) jitter
+    ms_jitter = jitter*1000 # convert to ms from secs
+    if ms_jitter > 10:
+        jitter = 2
+    elif ms_jitter <= 10 and ms_jitter > 5:
+        jitter = 1
+    else:
+        jitter = 0
+
+    # 4) cqi
+    if cqi <= 9:
+        cqi = 2
+    elif cqi <= 11 and cqi > 9:
+        cqi = 1
+    else:
+        cqi = 0
+
+    return app, length, jitter, cqi
 
 def post_slice(yhat,verbose=2,debug=0):
-    # make a policy based on yhat
-    need_post = 0
+    # Implement an efficient scheduling policy:
+    #
+    # Criteria:
+    # a) App,  b) Throughput,  c) Jitter,  d) CQI 
+    
+    # inverse scaling to the original scale 
+    yhat_inverse = scaler.inverse_transform(yhat)
 
-
-    ue_app_pairs = ['UE1: web-rtc','UE1: sipp','UE1: web-server','UE2: web-rtc','UE2: sipp',
-                'UE2: web-server','UE3: web-rtc','UE3: sipp','UE3: web-server']
-
-    predicted = []
-
-    new_y_hat = np.array([round(i) for i in yhat[0]])
+    # print logs
     if verbose == 2:
         print()
         print("|#####~~~~~~~~~~~~  Predictions  ~~~~~~~~~~~~~#####|")
-        print('Rounded yhat (next 5sec): \n ',new_y_hat)
-        print()
-        print('------------------------------------------')
-        print('|      yhat Translation (next 5sec):      ')
-        print("|      -----------------------------      ")
+        print('| - model\'s yhat (next 5sec): \n ',yhat)
+        print('|')
+        print('| - original scale yhat (next 5sec): \n ',yhat_inverse)
+        print('|')
 
-    for i in range(len(new_y_hat)):
-        if new_y_hat[i] == 1:
-            if verbose == 2:
-                print('|      ',ue_app_pairs[i])
-            predicted.append(ue_app_pairs[i])
+
+    # define coeffs, the weights for every criteria of the mathematical formula
+    coeff_a = 4     # app
+    coeff_b = 4     # throughput
+    coeff_c = 4     # jitter
+    coeff_d = 4     # cqi
+
+    # Obtain predicted values for every UE
+    n_ues = 3
+    slices = []
+    for ue in range(n_ues):
+        # parse UE's throughputs
+        web_rtc = yhat[ue + 0]
+        sipp = yhat[ue + 1]
+        web_server = yhat[ue + 2]
+
+        # parse UE's jitter
+        jitter = yhat[ue+9]
+
+        # parse UE's CQI
+        cqi = yhat[ue+12]
+
+        # filter with thresholds and define the level of priority for every criteria
+        app, length, jitter, cqi = filter_thresholds(web_rtc, sipp, web_server, jitter, cqi)
+
+        # make a decision for the slice's percentage value, based on the mathematical formula
+        decision = coeff_a * app + coeff_b * length + coeff_c * jitter + coeff_d * cqi
+
+        # append
+        slices.append(decision)
+
+    # In this point, all the new slice's percentages are ready
+    # Check if this slice is different from the existing slice
+    curr_slices = get_slices()
+
     if verbose == 2:
-        print('----------------------------------')
+        print('|')
+        print('|#####~~~~~~~~~~~~  Slicing Policy  ~~~~~~~~~~~~~#####|')
 
+    # comparison
+    if slices != curr_slices:
+        # post new slice
+        post_configure(slices[0], slices[1], slices[2], debug=debug)
 
-    # GET slices percentage
-    if debug == 0:
-        curr_slices = get_slices()
+        # print ue's slice
+        for ue in range(n_ues):
+            print('| - UE 1: ',slices[ue],'%')
+        print('|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|')
     else:
-        curr_slices = [8,8,8]
+        # no need to post the slice
+        # print ue's slice
+        for ue in range(n_ues):
+            print('| - UE 1: ',slices[ue],'%')
+        print('|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    # make a policy based on yhat
+    # need_post = 0
+
+
+    # ue_app_pairs = ['UE1: web-rtc','UE1: sipp','UE1: web-server','UE2: web-rtc','UE2: sipp',
+    #             'UE2: web-server','UE3: web-rtc','UE3: sipp','UE3: web-server']
+
+    # predicted = []
+
+    # new_y_hat = np.array([round(i) for i in yhat[0]])
+    # if verbose == 2:
+    #     print()
+    #     print("|#####~~~~~~~~~~~~  Predictions  ~~~~~~~~~~~~~#####|")
+    #     print('Rounded yhat (next 5sec): \n ',new_y_hat)
+    #     print()
+    #     print('------------------------------------------')
+    #     print('|      yhat Translation (next 5sec):      ')
+    #     print("|      -----------------------------      ")
+
+    # for i in range(len(new_y_hat)):
+    #     if new_y_hat[i] == 1:
+    #         if verbose == 2:
+    #             print('|      ',ue_app_pairs[i])
+    #         predicted.append(ue_app_pairs[i])
+    # if verbose == 2:
+    #     print('----------------------------------')
+
+
+    # # GET slices percentage
+    # if debug == 0:
+    #     curr_slices = get_slices()
+    # else:
+    #     curr_slices = [8,8,8]
     
 
 
-    ### decide slicing policy
-    # We want to investigate the predictions
-    # If we find Web-rtc app(s), we must raise the 
-    # percentage(s) of the corresponding UEs
+    # ### decide slicing policy
+    # # We want to investigate the predictions
+    # # If we find Web-rtc app(s), we must raise the 
+    # # percentage(s) of the corresponding UEs
 
 
-    ### Web-RTC ###
-    # UE1
-    if 'UE1: web-rtc' in predicted and curr_slices[0]==8:
-        need_post = 1
-        slice0 = 40
-    elif 'UE1: web-rtc' not in predicted and curr_slices[0]==40:
-        need_post = 1
-        slice0 = 8
-    else:
-        slice0 = curr_slices[0]
+    # ### Web-RTC ###
+    # # UE1
+    # if 'UE1: web-rtc' in predicted and curr_slices[0]==8:
+    #     need_post = 1
+    #     slice0 = 40
+    # elif 'UE1: web-rtc' not in predicted and curr_slices[0]==40:
+    #     need_post = 1
+    #     slice0 = 8
+    # else:
+    #     slice0 = curr_slices[0]
 
-    # UE2
-    if 'UE2: web-rtc' in predicted and curr_slices[1]==8:
-        need_post = 1
-        slice1 = 40
-    elif 'UE2: web-rtc' not in predicted and curr_slices[1]==40:
-        need_post = 1
-        slice1 = 8
-    else:
-        slice1 = curr_slices[1]    
+    # # UE2
+    # if 'UE2: web-rtc' in predicted and curr_slices[1]==8:
+    #     need_post = 1
+    #     slice1 = 40
+    # elif 'UE2: web-rtc' not in predicted and curr_slices[1]==40:
+    #     need_post = 1
+    #     slice1 = 8
+    # else:
+    #     slice1 = curr_slices[1]    
 
-    # UE3
-    if 'UE3: web-rtc' in predicted and curr_slices[2]==8:
-        need_post = 1
-        slice2 = 40
-    elif 'UE3: web-rtc' not in predicted and curr_slices[2]==40:
-        need_post = 1
-        slice2 = 8
-    else:
-        slice2 = curr_slices[2]    
+    # # UE3
+    # if 'UE3: web-rtc' in predicted and curr_slices[2]==8:
+    #     need_post = 1
+    #     slice2 = 40
+    # elif 'UE3: web-rtc' not in predicted and curr_slices[2]==40:
+    #     need_post = 1
+    #     slice2 = 8
+    # else:
+    #     slice2 = curr_slices[2]    
 
-    if need_post == 1:
-        post_configure(slice0, slice1, slice2, debug=debug)
-        need_post = 0    
+    # if need_post == 1:
+    #     post_configure(slice0, slice1, slice2, debug=debug)
+    #     need_post = 0    
 
-    if verbose == 2:
-        print()
-        print('----------------------------------')
-        print('|      Slicing Policy:      ')
-        print("|      ---------------      ")
-        if slice0 == 40:
-            print('|      UE1 -> More Resources')
-        else:
-            print('|      UE1 -> Normal Resources')
+    # if verbose == 2:
+    #     print()
+    #     print('----------------------------------')
+    #     print('|      Slicing Policy:      ')
+    #     print("|      ---------------      ")
+    #     if slice0 == 40:
+    #         print('|      UE1 -> More Resources')
+    #     else:
+    #         print('|      UE1 -> Normal Resources')
 
-        if slice1 == 40:
-            print('|      UE2 -> More Resources')
-        else:
-            print('|      UE2 -> Normal Resources')
+    #     if slice1 == 40:
+    #         print('|      UE2 -> More Resources')
+    #     else:
+    #         print('|      UE2 -> Normal Resources')
 
-        if slice2 == 40:
-            print('|      UE3 -> More Resources')
-        else:
-            print('|      UE3 -> Normal Resources')
-        print('----------------------------------')
+    #     if slice2 == 40:
+    #         print('|      UE3 -> More Resources')
+    #     else:
+    #         print('|      UE3 -> Normal Resources')
+    #     print('----------------------------------')
 
 
 
