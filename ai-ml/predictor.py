@@ -704,13 +704,13 @@ def post_slice(yhat,verbose=2,debug=0):
 
         # print ue's slice
         for ue in range(n_ues):
-            print('| - UE 1: ',slices[ue],'%')
+            print('| - UE ',ue+1,': ',slices[ue],'%')
         print('|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|')
     else:
         # no need to post the slice
         # print ue's slice
         for ue in range(n_ues):
-            print('| - UE 1: ',slices[ue],'%')
+            print('| - UE ',ue+1,': ',slices[ue],'%')
         print('|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|')
 
 
