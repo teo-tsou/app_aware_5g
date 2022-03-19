@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # read data
-df = pd.read_csv('data2.csv')
+df = pd.read_csv('data_range_0_15.csv')
 
 # drop time column
 new_df = df.drop(columns=['Time','empty'],axis=1)
@@ -16,7 +16,7 @@ mu, sigma = 0, 0.1 # mean and standard deviation
 
 
 train_df = pd.DataFrame(columns=new_df.columns)
-train_df.to_csv('train_data.csv')
+train_df.to_csv('train_data2_range0_15.csv')
 
 
 # how many scenarios we want to synthesize
@@ -77,6 +77,6 @@ for synth in range(num_synth):
         
         # now that you have the new row, append it in data frame
         temp_df = pd.DataFrame(new_row).T
-        temp_df.to_csv('train_data.csv', mode='a',header=False, index=False)
+        temp_df.to_csv('train_data2_range0_15.csv', mode='a',header=False, index=False)
 
 
