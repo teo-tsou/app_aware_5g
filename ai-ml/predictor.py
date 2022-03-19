@@ -670,15 +670,15 @@ def post_slice(yhat,verbose=2,debug=0):
     slices = []
     for ue in range(n_ues):
         # parse UE's throughputs
-        web_rtc = yhat[ue + 0]
-        sipp = yhat[ue + 1]
-        web_server = yhat[ue + 2]
+        web_rtc = yhat_inverse[ue + 0]
+        sipp = yhat_inverse[ue + 1]
+        web_server = yhat_inverse[ue + 2]
 
         # parse UE's jitter
-        jitter = yhat[ue+9]
+        jitter = yhat_inverse[ue+9]
 
         # parse UE's CQI
-        cqi = yhat[ue+12]
+        cqi = yhat_inverse[ue+12]
 
         # filter with thresholds and define the level of priority for every criteria
         app, length, jitter, cqi = filter_thresholds(web_rtc, sipp, web_server, jitter, cqi)
