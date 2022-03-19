@@ -17,8 +17,12 @@ import json
 import requests
 from statistics import mean
 import joblib
-scaler = joblib.load("/mnt/train_scaler_app_aware_CNN-LSTM.save")
 
+# load scaler
+scaler = joblib.load("/mnt/v2_train_scaler_app_aware_CNN-LSTM.save")
+
+# load model
+model = load_model('/mnt/v2__app_aware_CNN-LSTM_15cols__train_data2_range0_15__test_datarange0-15.best.hdf5')
 
 def packet_parser(mini_window_duration=1, max_mws=30, mode=0, verbose=0, debug=0, file_name= "/mnt/check.csv"):
     """
@@ -294,7 +298,7 @@ def packet_parser(mini_window_duration=1, max_mws=30, mode=0, verbose=0, debug=0
                         yhat = predict(X_scaled)
 
                         #post slice
-                        #post_slice(yhat, debug=debug)
+                        post_slice(yhat, debug=debug)
 
                     elif mw_num > max_mws:
                         print("[ERROR]: Mini-windows surpassed max limit!")
@@ -327,7 +331,7 @@ def packet_parser(mini_window_duration=1, max_mws=30, mode=0, verbose=0, debug=0
                     yhat = predict(X_scaled)
 
                     # post slice
-                    #post_slice(yhat, debug=debug)
+                    post_slice(yhat, debug=debug)
 
                 elif mw_num > max_mws:
                     print("[ERROR]: Mini-windows surpassed max limit!")
@@ -395,7 +399,7 @@ def packet_parser(mini_window_duration=1, max_mws=30, mode=0, verbose=0, debug=0
                 yhat = predict(X_scaled)
 
                 # post slice
-                #post_slice(yhat,debug=debug)
+                post_slice(yhat,debug=debug)
 
             elif mw_num > max_mws:
                 print("[ERROR]: Mini-windows surpassed max limit!")
@@ -543,28 +547,26 @@ def array_x(X):
 def scale_x(X_list,verbose=2):
     
     input_df = pd.DataFrame(X_list, columns = ["UE1: web-rtc","UE1: sipp","UE1: web-server","UE2: web-rtc","UE2: sipp","UE2: web-server","UE3: web-rtc","UE3: sipp","UE3: web-server","UE1-Jitter","UE2-Jitter","UE3-Jitter","UE1-CQI","UE2-CQI","UE3-CQI"])
-    print(input_df)
+    #print(input_df)
     input_df['UE1-Jitter'] = input_df['UE1-Jitter'].astype(float)
     input_df['UE2-Jitter'] = input_df['UE2-Jitter'].astype(float)
     input_df['UE3-Jitter'] = input_df['UE3-Jitter'].astype(float)
 
-    print(input_df.dtypes)
+    #print(input_df.dtypes)
     scaled_df = scaler.transform(input_df)
-    print(scaled_df)
+    #print(scaled_df)
     # input_df_normalized = pd.DataFrame(scaler.fit_transform(input_df), columns=input_df.columns)
-    exit()
+    # exit()
     # To Do:  here we will load the scaler used in model training 
     # flattened = np.array(X_list).reshape(-1,1)
     # rescaled = scaler.fit_transform(flattened)
     
     # X_scaled = rescaled.reshape(1,max_mws,9)
 
-    #return X_scaled
+    return scaled_df.values
 
 def predict(X_scaled,verbose=2):
-    # load model
-    model = load_model('../models/CNN-LSTM/app_aware_CNN-LSTM_15cols.best.hdf5')
-
+    
     yhat = model.predict(X_scaled)
 
     if verbose == 2:
