@@ -17,12 +17,17 @@ import json
 import requests
 from statistics import mean
 import joblib
+import math
 
 # load scaler
 scaler = joblib.load("/mnt/v2_train_scaler_app_aware_CNN-LSTM.save")
 
 # load model
 model = load_model('/mnt/v2__app_aware_CNN-LSTM_15cols__train_data2_range0_15__test_datarange0-15.best.hdf5')
+
+# init df for predictions
+y_df = pd.DataFrame(columns=["UE1: web-rtc","UE1: sipp","UE1: web-server","UE2: web-rtc","UE2: sipp","UE2: web-server","UE3: web-rtc","UE3: sipp","UE3: web-server","UE1-Jitter","UE2-Jitter","UE3-Jitter","UE1-CQI","UE2-CQI","UE3-CQI"])
+y_df.to_csv('yhat_inverse.txt')
 
 def packet_parser(mini_window_duration=1, max_mws=30, mode=0, verbose=0, debug=0, file_name= "/mnt/check.csv"):
     """
@@ -650,9 +655,17 @@ def post_slice(yhat,verbose=2,debug=0):
     # inverse scaling to the original scale 
     yhat_inverse = scaler.inverse_transform(yhat)
     yhat_inverse = yhat_inverse[0]
-    f = open('yhat_inverse.txt','a')
-    f.write(str(yhat_inverse))
-    f.write("\n")
+    #f = open('yhat_inverse.txt','a')
+
+    # round nums to be readable
+    y_rouned = [round(x,2) for x in yhat_inverse]
+
+    # convert to dataframe
+    y_df = pd.DataFrame(y_rouned, columns=["UE1: web-rtc","UE1: sipp","UE1: web-server","UE2: web-rtc","UE2: sipp","UE2: web-server","UE3: web-rtc","UE3: sipp","UE3: web-server","UE1-Jitter","UE2-Jitter","UE3-Jitter","UE1-CQI","UE2-CQI","UE3-CQI"])
+
+    y_df.to_csv('yhat_inverse.txt', mode='a', header=False, index=False)
+    # f.write(str(yhat_inverse))
+    # f.write("\n")
     
 
 
@@ -692,23 +705,46 @@ def post_slice(yhat,verbose=2,debug=0):
         app, length, jitter, cqi = filter_thresholds(web_rtc, sipp, web_server, jitter, cqi)
 
         # make a decision for the slice's percentage value, based on the mathematical formula
-        decision = coeff_a * app + coeff_b * length + coeff_c * jitter + coeff_d * cqi
+        decision = coeff_a * app + coeff_b * length + coeff_c * jitter + coeff_d * cqi + 8
 
         # append
         slices.append(decision)
 
     # In this point, all the new slice's percentages are ready
-    # Check if this slice is different from the existing slice
-    post_configure(slices[0], slices[1], slices[2], debug=0)
+    # check if they are over 100%
+
+    if np.sum(slices)>100:
+        # calculate the percentage that exceeds 100%
+        res = np.sum(slices) - 100
+
+        # calculate the amount that should be subtracted from every slice
+        subtract_ue = math.ceil(res/n_ues)
+
+        # subtract
+        for i in range(len(slices)):
+            slices[i] = slices[i] - subtract_ue
+
+    # write slices
+    f = open('slices.txt','a')
+    f.write(str(slices[0]))
+    f.write(",")
+    f.write(str(slices[1]))
+    f.write(",")
+    f.write(str(slices[2]))
+    f.write("\n")    
 
     if verbose == 2:
         print('|')
         print('|#####~~~~~~~~~~~~  Slicing Policy  ~~~~~~~~~~~~~#####|')
 
-    # comparison
-    #if slices != curr_slices:
-        # post new slice
     
+    # Check if this slice is different from the existing slice
+    curr_slices = get_slices()
+
+    # comparison
+    if slices != curr_slices:
+        # post new slice
+        post_configure(slices[0], slices[1], slices[2], debug=0)
 
         # print ue's slice
         for ue in range(n_ues):
@@ -989,13 +1025,7 @@ def json_extract(obj, key):
 
 def post_configure(slice0, slice1, slice2, debug=0):
     # defining the api-endpoint
-    f = open('slices.txt','a')
-    f.write(str(slice0))
-    f.write(",")
-    f.write(str(slice1))
-    f.write(",")
-    f.write(str(slice2))
-    f.write("\n")
+    
     
 
     API_ENDPOINT = "http://192.168.18.202:9999/slice/enb/-1"
