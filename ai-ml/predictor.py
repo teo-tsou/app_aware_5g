@@ -544,7 +544,7 @@ def array_x(X):
     return np.array(X_list)   
 
 
-def scale_x(X_list,verbose=2):
+def scale_x(X_list,verbose=2, max_mw=30):
     
     input_df = pd.DataFrame(X_list, columns = ["UE1: web-rtc","UE1: sipp","UE1: web-server","UE2: web-rtc","UE2: sipp","UE2: web-server","UE3: web-rtc","UE3: sipp","UE3: web-server","UE1-Jitter","UE2-Jitter","UE3-Jitter","UE1-CQI","UE2-CQI","UE3-CQI"])
     #print(input_df)
@@ -561,12 +561,13 @@ def scale_x(X_list,verbose=2):
     # flattened = np.array(X_list).reshape(-1,1)
     # rescaled = scaler.fit_transform(flattened)
     
-    # X_scaled = rescaled.reshape(1,max_mws,9)
+    X_scaled = scaled_df.reshape(1,max_mw,15)
 
-    return scaled_df.values
+    return X_scaled
 
 def predict(X_scaled,verbose=2):
-    
+    print(X_scaled)
+    print(X_scaled.shape)
     yhat = model.predict(X_scaled)
 
     if verbose == 2:
@@ -648,6 +649,7 @@ def post_slice(yhat,verbose=2,debug=0):
     
     # inverse scaling to the original scale 
     yhat_inverse = scaler.inverse_transform(yhat)
+    yhat_inverse = yhat_inverse[0]
 
     # print logs
     if verbose == 2:
@@ -668,6 +670,7 @@ def post_slice(yhat,verbose=2,debug=0):
     # Obtain predicted values for every UE
     n_ues = 3
     slices = []
+    
     for ue in range(n_ues):
         # parse UE's throughputs
         web_rtc = yhat_inverse[ue + 0]
