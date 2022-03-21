@@ -687,7 +687,7 @@ def post_slice(yhat,verbose=2,debug=0):
         app, length, jitter, cqi = filter_thresholds(web_rtc, sipp, web_server, jitter, cqi)
 
         # make a decision for the slice's percentage value, based on the mathematical formula
-        decision = coeff_a * app + coeff_b * length + coeff_c * jitter + coeff_d * cqi
+        decision = coeff_a * app + coeff_b * length + coeff_c * jitter + coeff_d * cqi + 8
 
         # append
         slices.append(decision)
