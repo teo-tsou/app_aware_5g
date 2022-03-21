@@ -1,4 +1,4 @@
-UE1: web-rtc,UE1: sipp,UE1: web-server,UE2: web-rtc,UE2: sipp,UE2: web-server,UE3: web-rtc,UE3: sipp,UE3: web-server,Time,UE1-Jitter,UE2-Jitter,UE3-Jitter,UE1-CQI,UE2-CQI,UE3-CQI
+UE1: web-rtc,UE1: sipp,UE1: web-server,UE2: web-rtc,UE2: sipp,UE2: web-server,UE3: web-rtc,UE3: sipp,UE3: web-server,Time,UE1-Jitter,UE2-Jitter,UE3-Jitter,UE1-CQI,UE2-CQI,UE3-CQI,empty
 16598,0,0,0,0,0,0,0,0,0.001068753,0.017647113771929825,0,0,14,15,15,
 8318,0,0,0,0,0,0,0,0,1.015053227,0.02101883455670103,0,0,10,14,15,
 26638,0,0,0,0,0,0,0,0,2.048245008,0.022381520022058822,0,0,13,15,15,
