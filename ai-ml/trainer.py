@@ -160,3 +160,4 @@ if __name__ == "__main__":
     model.add(Dense(15))
     model.compile(optimizer='adam', loss='mse')
     model.fit(X_data,y_data, validation_data=(X_val,y_val),epochs=100, callbacks=callbacks_list)
+
