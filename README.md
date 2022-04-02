@@ -20,7 +20,7 @@ http://nitlab.inf.uth.gr/doc/accessing_nitos.html
 
 2) Load the images on the nodes:
 
-Tested on Nodes: node055, node084, node085, node076, node065, node054
+Tested on Nodes: node055, node084, node085, node054, node065, node057
 
 node055: USRP B210 Node - Use it as a Kubernetes worker
 node084: Simple Node - Use it as a Kubernetes worker
