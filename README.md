@@ -26,7 +26,7 @@ node055: USRP B210 Node - Use it as a Kubernetes worker
 node084: Simple Node - Use it as a Kubernetes worker
 node086: Simple Node- Use it as Kubernetes Master Node
 
-node076, node065 & node054: HUAWEI LTE Dongles Nodes - Use them as UEs 
+node054, node065 & node057: HUAWEI LTE Dongles Nodes - Use them as UEs 
 
 For the Kubernetes Cluster (use the specific nodes):
 ```
@@ -36,7 +36,7 @@ slicename@nitlab3:~$ omf load -i app-aware-node.ndz -t node055,node084,node085
 
 For the UEs (use the specific nodes):
 
-`slicename@nitlab3:~$ omf load -i app-aware-ue.ndz -t node076,node065,node054`
+`slicename@nitlab3:~$ omf load -i app-aware-ue.ndz -t node054,node065,node057`
 
 After the load completes, access the nodes through ssh:
 e.g.: 
@@ -151,11 +151,11 @@ e.g
 
 For each UE:
 
-   `root@node076:~# minicom -D /dev/ttyUSB1` 
+   `root@node054:~# minicom -D /dev/ttyUSB1` 
 
    `root@node065:~# minicom -D /dev/ttyUSB0` 
 
-   `root@node054:~# minicom -D /dev/ttyUSB1` 
+   `root@node057:~# minicom -D /dev/ttyUSB1` 
 
 
 (For easy copy paste run on serial console: ^az -> t -> f -> change from 0 to 1 -> enter -> enter)
