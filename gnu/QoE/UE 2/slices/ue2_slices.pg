@@ -1,0 +1,31 @@
+reset
+set terminal postscript eps enhanced color font 'Arial,21'
+set output 'ue2_slice.eps'
+set term post size 6,2
+
+set datafile missing "-"
+set key noenhanced
+set title "UE 2 - Slices"
+
+set xlabel "Time (sec)"
+set ylabel "Percentage (%)"
+
+set auto x
+
+set key outside horiz top right
+set yrange [0:40]
+set xrange [-5:165]
+
+
+#set style fill solid border -1
+
+set style fill transparent solid 0.5 noborder
+
+set grid
+
+#set arrow from 0,30 to 162,30 nohead lc rgb 'red' dt 1
+
+plot 'gnu_slices.csv' using 1:3 with impulses notitle  lt rgb "blue" lw 4
+	
+reset
+
