@@ -8,7 +8,7 @@ set key noenhanced
 set title "UE 2 - Slices"
 
 set xlabel "Time (sec)"
-set ylabel "Percentage (%)"
+set ylabel "Resource blocks (%)"
 
 set auto x
 
@@ -23,7 +23,7 @@ set style fill transparent solid 0.5 noborder
 
 set grid
 
-#set arrow from 0,30 to 162,30 nohead lc rgb 'red' dt 1
+set arrow from 0,33 to 162,33 nohead lc rgb 'red' dt 1 lw 4
 
 plot 'gnu_slices.csv' using 1:3 with impulses notitle  lt rgb "blue" lw 4
 	

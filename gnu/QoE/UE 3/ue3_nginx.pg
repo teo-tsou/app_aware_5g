@@ -13,7 +13,7 @@ set ylabel "Throughput (Mbps)"
 set auto x
 
 set key outside horiz top right
-set yrange [0:1.5]
+set yrange [0:0.7]
 set xrange [-5:160]
 
 
