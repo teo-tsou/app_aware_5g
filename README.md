@@ -4,6 +4,7 @@ A cloud-native 5G Network based on OAI platform, fully deployed on Kubernetes, e
 
 If you find this project useful in your research, please consider citing:
 
+ ```
   @INPROCEEDINGS{cnert,
 AUTHOR="Theodoros Tsourdinis and Ilias Chatzistefanidis and Nikos Makris and
 Thanasis Korakis",
@@ -13,6 +14,7 @@ Testbeds (CNERT 2022) (INFOCOM WKSHPS CNERT 2022)",
 MONTH=may,
 YEAR=2022,
 }
+```
 
 **DEMO:**
 
