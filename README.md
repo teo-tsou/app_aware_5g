@@ -16,7 +16,7 @@ YEAR=2022,
 }
 ```
 
-![alt text]([https://github.com/[username]/[reponame]/blob/[branch]/image.jpg?raw=true](https://github.com/teo-tsou/app_aware_5g/blob/master/deployment/experimental%20(2).png)
+![alt text]([https://github.com/teo-tsou/app_aware_5g/blob/master/deployment/experimental%20(2).png)
 
 **DEMO:**
 
