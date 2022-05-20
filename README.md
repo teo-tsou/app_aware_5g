@@ -2,6 +2,18 @@
 
 A cloud-native 5G Network based on OAI platform, fully deployed on Kubernetes, enhanced with AI Unit to forecast the interactions between end-users and applications, and to improve the Quality of Experience of the users in real-time by utilizing the FlexRAN Controller.
 
+If you find this project useful in your research, please consider citing:
+
+  @INPROCEEDINGS{cnert,
+AUTHOR="Theodoros Tsourdinis and Ilias Chatzistefanidis and Nikos Makris and
+Thanasis Korakis",
+TITLE="{AI-driven} Service-aware Real-time Slicing for beyond {5G} Networks",
+BOOKTITLE="IEEE INFOCOM WKSHPS: Computer and Networking Experimental Research using
+Testbeds (CNERT 2022) (INFOCOM WKSHPS CNERT 2022)",
+MONTH=may,
+YEAR=2022,
+}
+
 **DEMO:**
 
 
