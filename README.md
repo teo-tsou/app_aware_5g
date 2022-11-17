@@ -21,7 +21,7 @@ YEAR=2022,
 **DEMO:**
 
 
-[![DEMO](https://img.youtube.com/vi/2scoAJRxJrY/0.jpg)](https://www.youtube.com/watch?v=2scoAJRxJrY)
+[![DEMO](https://img.youtube.com/vi/rDuXhm6UhJY/0.jpg)](https://www.youtube.com/watch?v=2scoAJRxJrY)
 
 
 ## Installation Guide:
