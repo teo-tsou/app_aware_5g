@@ -1,0 +1,29 @@
+#
+# Example of using histogram modes
+#
+reset
+set terminal postscript eps enhanced color font 'Arial,21'
+#set terminal png enhanced font 'Arial,17'
+#set output 'cpu.png'
+#set terminal eps
+set output 'cpu.eps'
+set datafile missing "-"
+set key noenhanced
+set title "CPU Usage over Training"
+set ylabel "CPU Usage"
+set xlabel "Time (min)"
+set auto x
+set ytics nomirror
+#set key box lw 2
+set key outside horiz top center
+#set yrange [0:50]
+set xrange [0:14]
+set y2tics
+
+
+#set datafile separator ","
+
+plot 'cpu-usage.txt' using 1:2 with lines   lw 3 title "Single-train Pod", \
+'' using 1:3 with lines   lw 4 title "Worker-1 Pod", \
+'' using 1:4 with lines   lw 4 title "Worker-2 Pod", \
+'' using 1:5 with lines   lw 4 title "Worker-3 Pod"

@@ -1,0 +1,31 @@
+reset
+set terminal postscript eps enhanced color font 'Arial,21'
+set output 'ue3_jitter.eps'
+set term post size 6,2
+
+set datafile missing "-"
+set key noenhanced
+set title "UE 3 - Jitter"
+
+set xlabel "Time (sec)"
+set ylabel "Jitter (ms)"
+
+set auto x
+
+set key outside horiz top right
+set yrange [0:40]
+set xrange [-5:160]
+
+
+#set style fill solid border -1
+
+set style fill transparent solid 0.5 noborder
+
+
+
+plot 'init_jitter.csv' using 1:13 with filledcurves x1 lt rgb "#FF8C00" lw 4 title "default",\
+	'final_jitter.csv' using 1:13 with filledcurves x1 lt rgb "#556B2F" lw 4 title "AI-unit"
+	
+	
+reset
+
