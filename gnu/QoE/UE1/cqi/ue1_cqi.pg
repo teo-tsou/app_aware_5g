@@ -1,0 +1,28 @@
+reset
+set terminal postscript eps enhanced color font 'Arial,21'
+set output 'ue1_cqi.eps'
+set term post size 6,2
+
+set datafile missing "-"
+set key noenhanced
+set title "UE 1 - CQI"
+
+set xlabel "Time (sec)"
+set ylabel "CQI"
+
+set auto x
+
+set key outside horiz top right
+set yrange [-1:15.9]
+set xrange [-5:160]
+
+
+#set style fill solid border -1
+
+set style fill transparent solid 0.5 noborder
+
+
+plot 'final_spacing.csv' using 1:14 with lines  lt rgb "#4B0082" lw 6 notitle
+	
+reset
+

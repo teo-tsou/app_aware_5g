@@ -1,0 +1,21 @@
+reset
+#set terminal png enhanced font 'Arial,17'
+#set output 'train-time.png'
+set terminal eps    
+set output 'train-time.eps'
+set title "Distributed Training Duration"
+set xlabel "Nodes - CPUs"
+set ylabel "Training Duration (seconds)"
+set auto x
+set auto y
+set key outside horiz top center
+#set yrange [0:80]
+set grid ytics
+set grid xtics
+set datafile missing "-"
+set key noenhanced
+set boxwidth 0.5
+set linetype 1 lc rgb "royalblue"
+set style fill solid
+unset key
+plot "train-time.txt" using 1:5:xtic(2) with boxes
