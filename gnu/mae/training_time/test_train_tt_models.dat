@@ -1,0 +1,7 @@
+#       
+FNN 66
+LSTM 63
+Bi-LSTM 58
+GRU 42
+CNN 26
+CNN-LSTM 4

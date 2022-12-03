@@ -1,0 +1,37 @@
+reset
+set terminal postscript eps enhanced color font 'Arial,21'
+set output 'cqi.eps'
+set term post size 6,2
+
+set datafile missing "-"
+set key noenhanced
+set title "Model Evaluation - CQI"
+
+#set xlabel "Time (sec)"
+set ylabel "MAE"
+
+set auto x
+
+set key outside horiz top right
+
+set style data histogram 
+set mytics 2
+set style histogram cluster gap 1
+
+set style fill solid
+
+set boxwidth 0.9
+set xtics format ""
+
+set grid
+
+set yrange [0:1]
+
+set border lw 2
+set xtics font ",15"
+set ytics font ",15"
+
+set key font ",12"
+
+plot "test_train_cqi_models.dat" using 2:xtic(1) title "Training" linecolor "#6E00A5",\
+	"test_train_cqi_models.dat" using 3 title "Testing" linecolor "#9A83A5"
