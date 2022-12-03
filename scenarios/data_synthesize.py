@@ -10,13 +10,13 @@ df = pd.read_csv('data_range_0_15.csv')
 new_df = df.drop(columns=['Time','empty'],axis=1)
 
 # implement gaussian noise
-mu, sigma = 0, 0.1 # mean and standard deviation
+mu, sigma = 0, 0.6 # mean and standard deviation
 
 
-
+output_file_name = 'v3_train_data2_range0_15.csv'
 
 train_df = pd.DataFrame(columns=new_df.columns)
-train_df.to_csv('train_data2_range0_15.csv')
+train_df.to_csv(output_file_name)
 
 
 # how many scenarios we want to synthesize
@@ -40,6 +40,9 @@ for synth in range(num_synth):
             # calculate noise percentage
             noise_percentage = np.random.normal(mu, sigma, 1)[0]
 
+            # cqi noise
+            cqi_noise = np.random.normal(0, 0.2, 1)[0]
+
             # convert str to numerical
             if isinstance(item, str):
                 item = eval(item)
@@ -57,6 +60,9 @@ for synth in range(num_synth):
                 # Jitters must not be rounded
                 if j in [9,10,11]:
                     noised_item = item + noise_percentage*col_mean
+                    
+                elif j in [12,13,14]:
+                    noised_item = round(item + cqi_noise*col_mean)
                 else:
                     noised_item = round(item + noise_percentage*col_mean)
             else:
@@ -77,6 +83,10 @@ for synth in range(num_synth):
         
         # now that you have the new row, append it in data frame
         temp_df = pd.DataFrame(new_row).T
-        temp_df.to_csv('train_data2_range0_15.csv', mode='a',header=False, index=False)
+        temp_df.to_csv(output_file_name, mode='a',header=False, index=False)
+        
+        
+        
+        
 
 
