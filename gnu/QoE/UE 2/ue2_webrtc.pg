@@ -1,7 +1,7 @@
 reset
-set terminal postscript eps enhanced color font 'Arial,21'
+set terminal postscript eps enhanced color font 'Arial,33'
 set output 'ue2_webrtc.eps'
-set term post size 6,2
+set term post size 6,3
 
 set datafile missing "-"
 set key noenhanced
@@ -13,9 +13,11 @@ set ylabel "Throughput (Mbps)"
 set auto x
 
 set key outside horiz top right
-set yrange [0:5]
+set yrange [0:6]
 set xrange [-5:160]
 
+set grid
+set ytics 2
 
 #set style fill solid border -1
 

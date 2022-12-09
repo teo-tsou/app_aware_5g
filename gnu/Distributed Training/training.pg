@@ -1,21 +1,35 @@
 reset
-#set terminal png enhanced font 'Arial,17'
-#set output 'train-time.png'
-set terminal eps    
+set terminal postscript eps enhanced color font 'Arial,33'
+set term post size 6,3
 set output 'train-time.eps'
+
 set title "Distributed Training Duration"
 set xlabel "Nodes - CPUs"
-set ylabel "Training Duration (seconds)"
+set ylabel "Training Duration (sec)"
+
 set auto x
-set auto y
+
 set key outside horiz top center
+set style data histogram 
+set mytics 2
+set style histogram cluster gap 1
+set grid
+set style fill solid
+
+
 #set yrange [0:80]
-set grid ytics
-set grid xtics
+
+
+set border lw 2
+set xtics font ",20"
+set ytics font ",20"
+set key font ",28"
+
 set datafile missing "-"
 set key noenhanced
 set boxwidth 0.5
-set linetype 1 lc rgb "royalblue"
-set style fill solid
-unset key
-plot "train-time.txt" using 1:5:xtic(2) with boxes
+set boxwidth 0.9
+
+#plot "train-time.dat" using 1:5:xtic(2) with boxes
+
+plot "train-time.dat" using 2:xtic(1) notitle linecolor "#002CDB"

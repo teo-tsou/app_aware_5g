@@ -1,7 +1,7 @@
 reset
-set terminal postscript eps enhanced color font 'Arial,21'
+set terminal postscript eps enhanced color font 'Arial,33'
 set output 'ue1_jitter.eps'
-set term post size 6,2
+set term post size 6,3
 
 set datafile missing "-"
 set key noenhanced
@@ -16,6 +16,8 @@ set key outside horiz top right
 set yrange [0:40]
 set xrange [-5:160]
 
+set grid
+set ytics 10
 
 #set style fill solid border -1
 

@@ -1,9 +1,9 @@
 #Time	Single Node Train  Distributed Train - Worker 1	Distributed Train - Worker 2	Distributed Train - Worker 3	Distributed Train - Worker 4
 0      0                 0                            0                             0                             0
-2      1.37              0.866                        0.890                         0.812                         0.836
-4      3.31              0.868                        0.894                         0.840                         0.818
-6      3.33              0.891                        0.838                         0.828                         0.860
-8      3.31              0                            0                             0                             0
-10     3.32              
-12     0.0000520              
+2      13.7              8.66                        8.90                         8.12                         8.36
+4      33.1              8.68                        8.94                         8.40                         8.18
+6      33.3              8.91                        8.38                         8.28                         8.60
+8      33.1              0                            0                             0                             0
+10     33.2              
+12     0.00520              
 		

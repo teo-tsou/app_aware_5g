@@ -1,7 +1,7 @@
 reset
-set terminal postscript eps enhanced color font 'Arial,21'
+set terminal postscript eps enhanced color font 'Arial,33'
 set output 'tp.eps'
-set term post size 6,2
+set term post size 6,3
 
 set datafile missing "-"
 set key noenhanced
@@ -28,10 +28,10 @@ set grid
 set yrange [0:7]
 
 set border lw 2
-set xtics font ",15"
-set ytics font ",15"
+set xtics font ",23"
+set ytics font ",28"
 
-set key font ",12"
+set key font ",28"
 
-plot "test_train_tp_models.dat" using 2:xtic(1) title "Training" linecolor "#006400",\
-	"test_train_tp_models.dat" using 3 title "Testing" linecolor "#5CDC64"
+plot "test_train_tp_models.dat" using 2:xtic(1) title "Time-series CV" linecolor "#006400",\
+	"test_train_tp_models.dat" using 3 title "Experiment" linecolor "#5CDC64"
