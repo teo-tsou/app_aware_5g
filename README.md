@@ -1,4 +1,4 @@
-# AI-driven Application-Aware 5G Network on Kubernetes:
+# Service-Aware Real-Time Slicing for Virtualized beyond 5G Networks
 
 A cloud-native 5G Network based on OAI platform, fully deployed on Kubernetes, enhanced with AI Unit to forecast the interactions between end-users and applications, and to improve the Quality of Experience of the users in real-time by utilizing the FlexRAN Controller.
 
