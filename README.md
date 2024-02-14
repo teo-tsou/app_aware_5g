@@ -2,7 +2,7 @@
 
 A cloud-native 5G Network based on OAI platform, fully deployed on Kubernetes, enhanced with AI Unit to forecast the interactions between end-users and applications, and to improve the Quality of Experience of the users in real-time by utilizing the FlexRAN Controller.
 
-If you find this project useful in your research, please consider citing:
+<!-- If you find this project useful in your research, please consider citing:
 
  ```
   @INPROCEEDINGS{cnert,
@@ -17,7 +17,7 @@ YEAR=2022,
 ```
 
 ![alt text](https://github.com/teo-tsou/app_aware_5g/blob/master/deployment/experimental%20(2).png)
-
+-->
 **DEMO:**
 
 
