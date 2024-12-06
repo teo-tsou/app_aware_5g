@@ -1,5 +1,21 @@
 # Service-Aware Real-Time Slicing for Virtualized beyond 5G Networks
 
+If you find this repository useful in your research, please consider citing the following paper:
+
+```
+@article{TSOURDINIS2024110445,
+title = {Service-aware real-time slicing for virtualized beyond 5G networks},
+journal = {Computer Networks},
+volume = {247},
+pages = {110445},
+year = {2024},
+issn = {1389-1286},
+doi = {https://doi.org/10.1016/j.comnet.2024.110445},
+url = {https://www.sciencedirect.com/science/article/pii/S1389128624002779},
+author = {Theodoros Tsourdinis and Ilias Chatzistefanidis and Nikos Makris and Thanasis Korakis and Navid Nikaein and Serge Fdida},
+keywords = {Beyond 5G, Service-aware, RAN slicing, OpenAirInterface, Kubernetes, Machine Learning, MLOps}
+```
+
 A cloud-native 5G Network based on OAI platform, fully deployed on Kubernetes, enhanced with AI Unit to forecast the interactions between end-users and applications, and to improve the Quality of Experience of the users in real-time by utilizing the FlexRAN Controller.
 
 <!-- If you find this project useful in your research, please consider citing:
